@@ -1,39 +1,77 @@
 {
-  "stem": "Main Showcase",
+  "root": {
+    "name": "Main 🌐",
+    "hint": "(Tap to explore 🌟)",
+    "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg"
+  },
   "branches": [
     {
-      "name": "Electronics",
+      "name": "Electronics 👉",
+      "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg",
       "leaves": [
-        {"name": "UltraBook Pro Laptop", "url": "/products/ultrabook-pro.html", "img": "images/laptop.png"},
-        {"name": "ProSnap Camera", "url": "/products/prosnap-camera.html", "img": "images/camera.png"},
-        {"name": "NextGen Smartphone", "url": "/products/nextgen-smartphone.html", "img": "https://i.postimg.cc/vgzYZTKW/6d46d20d4757db66f03702c3418502fc.jpg"},
-        {"name": "CrystalSound Headphones", "url": "/products/crystalsound-headphones.html", "img": "https://i.postimg.cc/6TW61V7z/6dfe6b5e3898dd33cc9fa30d20f2deb4.jpg"}
+        {
+          "name": "Laptop 💻",
+          "url": "https://example.com/laptop",
+          "image": "https://i.postimg.cc/cgS31ywR/IMG-20250820-WA0081.jpg"
+        },
+        {
+          "name": "Camera 📷",
+          "url": "https://example.com/camera",
+          "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg"
+        }
       ],
       "fruits": [
-        {"name": "Laptop Promo: Speed Boost", "url": "https://ads.com/laptop", "img": "images/laptop-promo.png"},
-        {"name": "Camera Special: Capture Life", "url": "https://ads.com/camera", "img": "https://i.postimg.cc/9DRQYW4h/8906e69e882131bcadda6ed996ac695c.jpg"}
+        {
+          "name": "Laptop Promo 🍎 (Deal 🎁)",
+          "url": "https://example.com/laptop-promo",
+          "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg"
+        }
       ]
     },
     {
-      "name": "Clothing",
+      "name": "Clothing 👉",
+      "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg",
       "leaves": [
-        {"name": "EcoSoft T-Shirt", "url": "/products/ecosoft-tshirt.html", "img": "images/tshirt.png"},
-        {"name": "UrbanShield Jacket", "url": "/products/urbanshield-jacket.html", "img": "images/jacket.png"},
-        {"name": "AirStride Sneakers", "url": "/products/airstride-sneakers.html", "img": "https://i.postimg.cc/VJxL73Mb/983766ae227befb91a74cfba62f62fa8.jpg"},
-        {"name": "SunGuard Cap", "url": "/products/sunguard-cap.html", "img": "https://i.postimg.cc/zb5DNKxz/d7928186887071adbdd5bd26ead74653.jpg"}
+        {
+          "name": "T-Shirt 👕",
+          "url": "https://example.com/tshirt",
+          "image": "https://i.postimg.cc/cgS31ywR/IMG-20250820-WA0081.jpg"
+        },
+        {
+          "name": "Jacket 🧥",
+          "url": "https://example.com/jacket",
+          "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg"
+        }
       ],
       "fruits": [
-        {"name": "Summer Sale: Light & Cool", "url": "https://ads.com/summer", "img": "images/summer-sale.png"},
-        {"name": "Winter Deal: Cozy Layers", "url": "https://ads.com/winter", "img": "https://i.postimg.cc/94yXsJtg/f543d86d2caf4f9925aa2611d8171374.jpg"}
+        {
+          "name": "Summer Sale 🍒 (Deal ✨)",
+          "url": "https://example.com/summer-sale",
+          "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg"
+        }
       ]
     },
     {
-      "name": "Accessories",
+      "name": "Home 👉",
+      "image": "https://i.postimg.cc/cgS31ywR/IMG-20250820-WA0081.jpg",
       "leaves": [
-        {"name": "TimeMaster Luxury Watch", "url": "/products/timemaster-watch.html", "img": "https://i.postimg.cc/Lg8HYRdG/fec36ec52a2226fdeb04c85caa4ecc8d.jpg"}
+        {
+          "name": "Lamp 💡",
+          "url": "https://example.com/lamp",
+          "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg"
+        },
+        {
+          "name": "Rug 🧶",
+          "url": "https://example.com/rug",
+          "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg"
+        }
       ],
       "fruits": [
-        {"name": "Exclusive Accessory: Timeless Elegance", "url": "https://ads.com/accessory", "img": "https://i.postimg.cc/Lg8HYRdG/fec36ec52a2226fdeb04c85caa4ecc8d.jpg"}
+        {
+          "name": "Decor Promo 🎁 (Deal ✨)",
+          "url": "https://example.com/decor-promo",
+          "image": "https://i.postimg.cc/cgS31ywR/IMG-20250820-WA0081.jpg"
+        }
       ]
     }
   ]

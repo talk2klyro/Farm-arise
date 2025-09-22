@@ -5,21 +5,36 @@
       "name": "Electronics",
       "leaves": [
         {"name": "Laptop", "url": "/laptop.html", "img": "images/laptop.png"},
-        {"name": "Camera", "url": "/camera.html", "img": "images/camera.png"}
+        {"name": "Camera", "url": "/camera.html", "img": "images/camera.png"},
+        {"name": "Smartphone", "url": "/smartphone.html", "img": "https://i.postimg.cc/vgzYZTKW/6d46d20d4757db66f03702c3418502fc.jpg"},
+        {"name": "Headphones", "url": "/headphones.html", "img": "https://i.postimg.cc/6TW61V7z/6dfe6b5e3898dd33cc9fa30d20f2deb4.jpg"}
       ],
       "fruits": [
-        {"name": "Laptop Promo", "url": "https://ads.com/laptop", "img": "images/laptop-promo.png"}
+        {"name": "Laptop Promo", "url": "https://ads.com/laptop", "img": "images/laptop-promo.png"},
+        {"name": "Camera Special", "url": "https://ads.com/camera", "img": "https://i.postimg.cc/9DRQYW4h/8906e69e882131bcadda6ed996ac695c.jpg"}
       ]
     },
     {
       "name": "Clothing",
       "leaves": [
         {"name": "T-Shirt", "url": "/tshirt.html", "img": "images/tshirt.png"},
-        {"name": "Jacket", "url": "/jacket.html", "img": "images/jacket.png"}
+        {"name": "Jacket", "url": "/jacket.html", "img": "images/jacket.png"},
+        {"name": "Sneakers", "url": "/sneakers.html", "img": "https://i.postimg.cc/VJxL73Mb/983766ae227befb91a74cfba62f62fa8.jpg"},
+        {"name": "Hat", "url": "/hat.html", "img": "https://i.postimg.cc/zb5DNKxz/d7928186887071adbdd5bd26ead74653.jpg"}
       ],
       "fruits": [
-        {"name": "Summer Sale", "url": "https://ads.com/summer", "img": "images/summer-sale.png"}
+        {"name": "Summer Sale", "url": "https://ads.com/summer", "img": "images/summer-sale.png"},
+        {"name": "Winter Deal", "url": "https://ads.com/winter", "img": "https://i.postimg.cc/94yXsJtg/f543d86d2caf4f9925aa2611d8171374.jpg"}
+      ]
+    },
+    {
+      "name": "Accessories",
+      "leaves": [
+        {"name": "Watch", "url": "/watch.html", "img": "https://i.postimg.cc/Lg8HYRdG/fec36ec52a2226fdeb04c85caa4ecc8d.jpg"}
+      ],
+      "fruits": [
+        {"name": "Exclusive Accessory", "url": "https://ads.com/accessory", "img": "https://i.postimg.cc/Lg8HYRdG/fec36ec52a2226fdeb04c85caa4ecc8d.jpg"}
       ]
     }
   ]
-}
+        }

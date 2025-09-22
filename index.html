@@ -28,7 +28,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
     text-align: center;
     padding: 8px;
     line-height: 1.2;
@@ -46,6 +46,7 @@
     transform: translate(-50%, -50%);
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     animation: breathe 3s infinite;
+    z-index: 10;
   }
 
   @keyframes breathe {
@@ -59,6 +60,14 @@
     background: #43a047;
     color: white;
     font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+  }
+
+  .branch.active {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .leaf {
@@ -134,7 +143,10 @@ root.className = "node root";
 root.textContent = data.root.name;
 radial.appendChild(root);
 
-// Place branches in circle
+let branchesVisible = false;
+const branchNodes = [];
+
+// Place branches in circle (but keep hidden until root clicked)
 const branchCount = data.branches.length;
 const radius = 200;
 
@@ -170,7 +182,21 @@ data.branches.forEach((branch, i) => {
 
     branchNode.appendChild(itemNode);
   });
+
+  branchNodes.push(branchNode);
 });
+
+// Toggle branches when root is clicked
+root.onclick = () => {
+  branchesVisible = !branchesVisible;
+  branchNodes.forEach(b => {
+    if (branchesVisible) {
+      b.classList.add("active");
+    } else {
+      b.classList.remove("active");
+    }
+  });
+};
 </script>
 
 </body>

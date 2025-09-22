@@ -17,8 +17,8 @@
 
   #radial {
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 600px;
+    height: 600px;
   }
 
   .node {
@@ -30,11 +30,13 @@
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
     text-align: center;
+    padding: 8px;
+    line-height: 1.2;
   }
 
   .root {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     background: #00796b;
     color: white;
     font-weight: bold;
@@ -43,11 +45,17 @@
     top: 50%;
     transform: translate(-50%, -50%);
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    animation: breathe 3s infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.08); }
   }
 
   .branch {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     background: #43a047;
     color: white;
     font-size: 14px;
@@ -58,6 +66,7 @@
     height: 70px;
     background: #aed581;
     font-size: 12px;
+    animation: orbit 12s linear infinite;
   }
 
   .fruit {
@@ -65,7 +74,7 @@
     height: 70px;
     background: #ffb74d;
     font-size: 12px;
-    animation: pulse 2s infinite;
+    animation: orbit 15s linear infinite, pulse 2s infinite;
   }
 
   .node:hover {
@@ -75,9 +84,14 @@
   }
 
   @keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,165,0,0.6); }
-    50% { transform: scale(1.15); box-shadow: 0 0 20px rgba(255,165,0,0.6); }
-    100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,165,0,0.6); }
+    0% { box-shadow: 0 0 0 rgba(255,165,0,0.6); }
+    50% { box-shadow: 0 0 20px rgba(255,165,0,0.8); }
+    100% { box-shadow: 0 0 0 rgba(255,165,0,0.6); }
+  }
+
+  @keyframes orbit {
+    from { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
   }
 </style>
 </head>
@@ -87,26 +101,26 @@
 
 <script>
 const data = {
-  root: { name: "Main 🌐" },
+  root: { name: "Main 🌐\n(Tap me 🌟)" },
   branches: [
     {
-      name: "Electronics",
+      name: "Electronics 👉",
       leaves: [
-        { name: "Laptop 💻", url: "#" },
-        { name: "Camera 📷", url: "#" }
+        { name: "Laptop 💻\n(Click 🖱️)", url: "#" },
+        { name: "Camera 📷\n(Click 🖱️)", url: "#" }
       ],
       fruits: [
-        { name: "Laptop Promo 🍎", url: "#" }
+        { name: "Laptop Promo 🍎\n(Deal 🎁)", url: "#" }
       ]
     },
     {
-      name: "Clothing",
+      name: "Clothing 👉",
       leaves: [
-        { name: "T-Shirt 👕", url: "#" },
-        { name: "Jacket 🧥", url: "#" }
+        { name: "T-Shirt 👕\n(Click 🖱️)", url: "#" },
+        { name: "Jacket 🧥\n(Click 🖱️)", url: "#" }
       ],
       fruits: [
-        { name: "Summer Sale 🍒", url: "#" }
+        { name: "Summer Sale 🍒\n(Deal ✨)", url: "#" }
       ]
     }
   ]
@@ -122,29 +136,29 @@ radial.appendChild(root);
 
 // Place branches in circle
 const branchCount = data.branches.length;
-const radius = 180;
+const radius = 200;
 
 data.branches.forEach((branch, i) => {
   const angle = (i / branchCount) * 2 * Math.PI;
   const branchNode = document.createElement("div");
   branchNode.className = "node branch";
   branchNode.textContent = branch.name;
-  branchNode.style.left = `${250 + radius * Math.cos(angle) - 45}px`;
-  branchNode.style.top = `${250 + radius * Math.sin(angle) - 45}px`;
+  branchNode.style.left = `${300 + radius * Math.cos(angle) - 50}px`;
+  branchNode.style.top = `${300 + radius * Math.sin(angle) - 50}px`;
   radial.appendChild(branchNode);
 
   // Leaves + fruits around branch
   const items = [...branch.leaves.map(l => ({...l, type: "leaf"})),
                  ...branch.fruits.map(f => ({...f, type: "fruit"}))];
-  const itemRadius = 100;
 
   items.forEach((item, j) => {
-    const subAngle = (j / items.length) * 2 * Math.PI;
     const itemNode = document.createElement("div");
     itemNode.className = `node ${item.type}`;
     itemNode.textContent = item.name;
-    itemNode.style.left = `${parseFloat(branchNode.style.left) + 45 + itemRadius * Math.cos(subAngle) - 35}px`;
-    itemNode.style.top = `${parseFloat(branchNode.style.top) + 45 + itemRadius * Math.sin(subAngle) - 35}px`;
+
+    // Position relative to branch center
+    itemNode.style.left = `${parseFloat(branchNode.style.left) + 50}px`;
+    itemNode.style.top = `${parseFloat(branchNode.style.top) + 50}px`;
 
     itemNode.onclick = () => {
       if (item.type === "fruit") {
@@ -154,7 +168,7 @@ data.branches.forEach((branch, i) => {
       }
     };
 
-    radial.appendChild(itemNode);
+    branchNode.appendChild(itemNode);
   });
 });
 </script>

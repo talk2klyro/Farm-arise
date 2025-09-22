@@ -1,0 +1,73 @@
+bobody {
+  font-family: Arial, sans-serif;
+  background-color: #f0f8ff;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+#tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.stem {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.branch-name {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 2px solid green;
+  background-color: #d4edda;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+button img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 5px;
+  object-fit: contain;
+}
+
+button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Fruits styling */
+button.fruit {
+  border-color: orange;
+  background-color: #ffe0b2;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0px rgba(255,165,0,0.7);}
+  50% { box-shadow: 0 0 15px rgba(255,165,0,0.7);}
+  100% { box-shadow: 0 0 0px rgba(255,165,0,0.7);}
+}

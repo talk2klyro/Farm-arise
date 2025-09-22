@@ -3,201 +3,209 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🥬 Crunchy Celery – Healthy & Fun!</title>
-<meta name="description" content="Dynamic celery blog with recipes, tips, and playful ways to enjoy veggies!">
-<meta name="keywords" content="celery, healthy snack, recipes, nutrition, vegetables, GPT-5 blog">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta name="description" content="Crunchy Celery – Healthy, Fun, and Easy Snack Ideas. Discover recipes, tips, and playful ways to enjoy celery every day.">
+<meta name="keywords" content="celery, healthy snack, vegetable tips, recipes, nutrition">
+<meta name="author" content="Your Name">
+<title>Crunchy Celery – Simple, Healthy, Fun! 🥬</title>
+
+<!-- Google Fonts: Clean and Friendly -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-/* --- Global Reset --- */
-* {margin:0; padding:0; box-sizing:border-box;}
-body {font-family:'Inter',sans-serif; line-height:1.7; background:#f4fff4; color:#2c3e2c; scroll-behavior:smooth;}
-a {text-decoration:none;}
+/* --- Global Resets --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* Container */
-.blog-container {max-width:960px; margin:2rem auto; padding:2rem 3rem; background:#fff; border-radius:1rem; box-shadow:0 10px 25px rgba(0,0,0,0.08);}
-.blog-container:hover {transform:translateY(-5px); box-shadow:0 15px 35px rgba(0,0,0,0.12); transition:all 0.3s;}
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    background-color: #f4fff4; /* calm celery green background */
+    color: #2c3e2c;
+    padding: 2rem;
+}
 
-/* Headers */
-.blog-header h1 {font-family:'Roboto Slab', serif; font-size:3rem; text-align:center; color:#1b3d1b; margin-bottom:0.5rem;}
-.blog-header p {text-align:center; font-size:1.15rem; color:#4b6b4b; margin-bottom:1rem;}
+/* --- Blog Container --- */
+.blog-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 2rem 3rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-/* Sections */
-section {margin-bottom:2rem;}
-section h2 {font-family:'Roboto Slab', serif; font-size:2rem; margin-bottom:0.7rem; color:#1b3d1b; position:relative;}
-section h2::after {content:''; display:block; width:60px; height:4px; background:#a3d9a5; margin-top:6px; border-radius:3px;}
-ul,ol {margin-left:1.8rem; margin-top:0.5rem;}
-li {margin-bottom:0.6rem; line-height:1.5;}
+.blog-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
 
-/* Emojis */
-.emoji {font-size:1.3rem; margin-right:0.5rem; transition:transform 0.2s;}
-.emoji:hover {transform:scale(1.3);}
+/* --- Header --- */
+.blog-header h1 {
+    font-family: 'Roboto Slab', serif;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #1b3d1b; /* deep reliable green */
+}
 
-/* Hooks, Tips, Callouts */
-.intro {font-size:1.2rem; background:#e6ffee; padding:1rem 1.5rem; border-left:6px solid #a3d9a5; border-radius:0.5rem;}
-.tips {background:#f0fff0; padding:1rem 1.5rem; border-left:6px solid #7bc47f; border-radius:0.5rem;}
-.callout {background:#d0f0d0; padding:0.8rem 1.2rem; border-radius:0.5rem; font-style:italic; color:#2c5c2c;}
+.blog-header p {
+    font-size: 1.1rem;
+    text-align: center;
+    color: #4b6b4b;
+}
 
-/* Buttons */
-.button {display:inline-block; background:#a3d9a5; color:#1b3d1b; padding:0.7rem 1.5rem; border-radius:0.6rem; font-weight:600; cursor:pointer; transition:all 0.3s; margin-top:0.5rem;}
-.button:hover {background:#7bc47f; color:#fff; transform:scale(1.05);}
-.cta-button {position:fixed; bottom:20px; right:20px; background:#7bc47f; color:white; padding:0.8rem 1.5rem; border-radius:1rem; font-weight:700; cursor:pointer; transition:0.2s; z-index:999;}
-.cta-button:hover {background:#5db475; transform:scale(1.05);}
+/* --- Sections --- */
+section {
+    margin-bottom: 2rem;
+}
 
-/* Table of Contents */
-.toc {position:sticky; top:2rem; background:#f4fff4; padding:1rem 1.2rem; border-radius:0.5rem; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-bottom:2rem;}
-.toc a {display:block; color:#1b3d1b; margin-bottom:0.5rem; transition:color 0.2s;}
-.toc a:hover {color:#7bc47f;}
+section h2 {
+    font-family: 'Roboto Slab', serif;
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: #1b3d1b;
+    position: relative;
+}
 
-/* Newsletter */
-.newsletter{position:fixed; bottom:20px; left:20px; background:#e6ffee; padding:1rem 1.5rem; border-radius:1rem; box-shadow:0 5px 15px rgba(0,0,0,0.2); z-index:998;}
-.newsletter input[type="email"]{padding:0.5rem; border-radius:0.3rem; border:1px solid #7bc47f; margin-right:0.5rem;}
-.newsletter button{padding:0.5rem 1rem; background:#7bc47f; border:none; color:white; font-weight:600; border-radius:0.3rem; cursor:pointer; transition:0.3s;}
-.newsletter button:hover{background:#5db475;}
+section h2::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: #a3d9a5;
+    margin-top: 5px;
+    border-radius: 2px;
+}
 
-/* Dark Mode */
-body.dark-mode{background:#1e1e1e; color:#d9f0d9;}
-body.dark-mode .blog-container{background:#2a2a2a; box-shadow:0 10px 25px rgba(0,0,0,0.5);}
-body.dark-mode .intro, body.dark-mode .tips, body.dark-mode .callout{background:#3a3a3a; border-left-color:#5db475;}
-body.dark-mode .toc{background:#2a2a2a; box-shadow:0 5px 15px rgba(0,0,0,0.4);}
-body.dark-mode .button, body.dark-mode a{color:#d9f0d9;}
-body.dark-mode .button:hover{background:#5db475;}
+/* --- Lists --- */
+ul, ol {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
 
-/* Responsive */
-@media(max-width:768px){.blog-container{padding:1.5rem 1.8rem;} section h2{font-size:1.7rem;} .blog-header h1{font-size:2.2rem;}}
-@media(max-width:480px){.blog-container{padding:1rem 1.2rem;} .blog-header h1{font-size:1.8rem;} .toc{position:relative; top:auto; margin-bottom:1rem;} .button{width:100%; text-align:center;} ul,ol{margin-left:1rem;}}
+li {
+    margin-bottom: 0.5rem;
+}
+
+/* --- Emojis Styling --- */
+.emoji {
+    font-size: 1.3rem;
+    margin-right: 0.5rem;
+}
+
+/* --- Intro Hook --- */
+.intro {
+    font-size: 1.15rem;
+    background: #e6ffee;
+    padding: 1rem 1.5rem;
+    border-left: 6px solid #a3d9a5;
+    border-radius: 0.5rem;
+}
+
+/* --- Tips & Variations --- */
+.tips {
+    background: #f0fff0;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    border-left: 6px solid #7bc47f;
+}
+
+/* --- Callouts / Notes --- */
+.callout {
+    background: #d0f0d0;
+    padding: 0.8rem 1.2rem;
+    border-radius: 0.5rem;
+    font-style: italic;
+    color: #2c5c2c;
+}
+
+/* --- Footer --- */
+.blog-footer {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #4b6b4b;
+    padding-top: 1rem;
+    border-top: 1px solid #d9ead9;
+}
+
+/* --- Buttons for CTA --- */
+.button {
+    display: inline-block;
+    background: #a3d9a5;
+    color: #1b3d1b;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.button:hover {
+    background: #7bc47f;
+    color: #ffffff;
+}
 </style>
 </head>
+
 <body>
-
 <div class="blog-container">
-  <!-- Table of Contents -->
-  <nav class="toc" id="toc"><strong>📑 Contents</strong></nav>
+    <header class="blog-header">
+        <h1>🥬 Crunchy Celery – Simple, Healthy, and Fun!</h1>
+        <p>Discover playful ways to enjoy celery every day 🌱💚</p>
+    </header>
 
-  <!-- Header -->
-  <header class="blog-header">
-    <h1 id="title">Loading...</h1>
-    <p id="subtitle"></p>
-    <button class="button" id="darkModeToggle">🌓 Toggle Dark Mode</button>
-  </header>
+    <section class="intro">
+        <p>Think about it: what if a crunchy green stick could be more than just a side? 🥬 Celery is simple, fun to eat, and secretly full of vitamins and energy! 💪</p>
+    </section>
 
-  <!-- Blog Sections -->
-  <section id="intro" class="intro"></section>
-  <section id="definition"></section>
-  <section id="steps"></section>
-  <section id="apply"></section>
-  <section id="tips" class="tips"></section>
-  <section id="closing" class="callout"></section>
+    <section>
+        <h2>❓ What Is Celery?</h2>
+        <p>Celery is a crunchy vegetable that grows in long green stalks 🥬. It’s full of water, fiber, and vitamins, making it a healthy snack or ingredient 🌟.</p>
+    </section>
 
-  <!-- Footer -->
-  <footer class="blog-footer">
-      <p>© 2025 Your Blog Name | Healthy & Fun 🌱</p>
-      <a href="#" class="button">Read More Veggie Tips</a>
-  </footer>
+    <section>
+        <h2>🍳 How to Use/Do It</h2>
+        <ol>
+            <li>Wash the celery stalks thoroughly 🚿</li>
+            <li>Cut into sticks or bite-size pieces 🔪</li>
+            <li>Eat raw, dip in hummus, or add to soups and salads 🥣</li>
+            <li>Store leftovers in water in the fridge for extra crunch ❄️</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>🍽 How to Use/Apply It</h2>
+        <ul>
+            <li><span class="emoji">🥜</span> Snack on it with peanut butter or cheese 🧀</li>
+            <li><span class="emoji">🥗</span> Add to salads for crunch</li>
+            <li><span class="emoji">🍲</span> Use in soups, stews, or stir-fries</li>
+            <li><span class="emoji">⛵</span> Make fun celery “boats” with cream cheese and toppings</li>
+            <li><span class="emoji">🍹</span> Blend into smoothies for a green boost</li>
+        </ul>
+    </section>
+
+    <section class="tips">
+        <h2>💡 Tips & Variations</h2>
+        <ul>
+            <li>Try green or red celery varieties 🟩🟥</li>
+            <li>Sprinkle with a little lemon juice for extra zing 🍋</li>
+            <li>Add nuts or seeds for a crunchy twist 🌰</li>
+            <li>Mix with other veggies for colorful snacks 🌶🥕</li>
+        </ul>
+    </section>
+
+    <section class="callout">
+        🌟 Now you know how easy and fun celery can be! 😋 One crunchy stalk can turn a snack into a mini adventure. Try it, share it, and enjoy! 🌈
+    </section>
+
+    <footer class="blog-footer">
+        <p>© 2025 Your Blog Name | Healthy & Fun 🌱</p>
+        <a href="#" class="button">Read More Veggie Tips</a>
+    </footer>
 </div>
-
-<!-- CTA Button -->
-<div class="cta-button" id="ctaButton">🛒 Buy This Blog Template</div>
-
-<!-- Newsletter -->
-<div class="newsletter" id="newsletter">
-  <form id="newsletterForm">
-    <input type="email" placeholder="Your email..." required />
-    <button type="submit">Subscribe ✉️</button>
-  </form>
-</div>
-
-<script>
-// --- Dark Mode ---
-document.getElementById('darkModeToggle').addEventListener('click', ()=>{
-  document.body.classList.toggle('dark-mode');
-});
-
-// --- Table of Contents Generation ---
-function generateTOC(){
-  const toc = document.getElementById('toc');
-  const sections = document.querySelectorAll('section');
-  sections.forEach(sec=>{
-    const h2 = sec.querySelector('h2');
-    if(h2){
-      const a = document.createElement('a');
-      a.href = `#${sec.id}`;
-      a.innerText = h2.innerText;
-      toc.appendChild(a);
-    }
-  });
-}
-
-// --- Newsletter ---
-document.getElementById('newsletterForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  const email = e.target.querySelector('input').value;
-  alert(`Thank you for subscribing! 🌱 We'll send updates to: ${email}`);
-  e.target.reset();
-});
-  
-// --- GPT-5 Simulated Content ---
-function populateBlog(){
-  // Header
-  document.getElementById('title').innerText = "🥬 Crunchy Celery – Simple, Healthy, and Fun!";
-  document.getElementById('subtitle').innerText = "Discover playful ways to enjoy celery every day 🌱💚";
-
-  // Intro
-  document.getElementById('intro').innerHTML = `
-    <p>Think about it: what if a crunchy green stick could be more than just a side? 🥬 Celery is simple, fun to eat, and secretly full of vitamins and energy! 💪</p>
-  `;
-
-  // Definition
-  document.getElementById('definition').innerHTML = `
-    <h2>❓ What Is Celery?</h2>
-    <p>Celery is a crunchy vegetable that grows in long green stalks 🥬. It’s full of water, fiber, and vitamins, making it a healthy snack or ingredient 🌟.</p>
-  `;
-
-  // Steps
-  document.getElementById('steps').innerHTML = `
-    <h2>🍳 How to Use/Do It</h2>
-    <ol>
-      <li>Wash the celery stalks thoroughly 🚿</li>
-      <li>Cut into sticks or bite-size pieces 🔪</li>
-      <li>Eat raw, dip in hummus, or add to soups and salads 🥣</li>
-      <li>Store leftovers in water in the fridge for extra crunch ❄️</li>
-    </ol>
-  `;
-
-  // Apply
-  document.getElementById('apply').innerHTML = `
-    <h2>🍽 How to Use/Apply It</h2>
-    <ul>
-      <li><span class="emoji">🥜</span> Snack on it with peanut butter or cheese 🧀</li>
-      <li><span class="emoji">🥗</span> Add to salads for crunch</li>
-      <li><span class="emoji">🍲</span> Use in soups, stews, or stir-fries</li>
-      <li><span class="emoji">⛵</span> Make fun celery “boats” with cream cheese and toppings</li>
-      <li><span class="emoji">🍹</span> Blend into smoothies for a green boost</li>
-    </ul>
-  `;
-
-  // Tips & Variations
-  document.getElementById('tips').innerHTML = `
-    <h2>💡 Tips & Variations</h2>
-    <ul>
-      <li>Try green or red celery varieties 🟩🟥</li>
-      <li>Sprinkle with a little lemon juice for extra zing 🍋</li>
-      <li>Add nuts or seeds for a crunchy twist 🌰</li>
-      <li>Mix with other veggies for colorful snacks 🌶🥕</li>
-    </ul>
-  `;
-
-  // Closing
-  document.getElementById('closing').innerHTML = `
-    🌟 Now you know how easy and fun celery can be! 😋 One crunchy stalk can turn a snack into a mini adventure. Try it, share it, and enjoy! 🌈
-  `;
-}
-
-// Populate blog on page load
-window.addEventListener('DOMContentLoaded', ()=>{
-  populateBlog();
-  generateTOC();
-});
-</script>
 </body>
-</html>
+  </html>

@@ -1,0 +1,25 @@
+{
+  "stem": "Main Showcase",
+  "branches": [
+    {
+      "name": "Electronics",
+      "leaves": [
+        {"name": "Laptop", "url": "/laptop.html", "img": "images/laptop.png"},
+        {"name": "Camera", "url": "/camera.html", "img": "images/camera.png"}
+      ],
+      "fruits": [
+        {"name": "Laptop Promo", "url": "https://ads.com/laptop", "img": "images/laptop-promo.png"}
+      ]
+    },
+    {
+      "name": "Clothing",
+      "leaves": [
+        {"name": "T-Shirt", "url": "/tshirt.html", "img": "images/tshirt.png"},
+        {"name": "Jacket", "url": "/jacket.html", "img": "images/jacket.png"}
+      ],
+      "fruits": [
+        {"name": "Summer Sale", "url": "https://ads.com/summer", "img": "images/summer-sale.png"}
+      ]
+    }
+  ]
+}

@@ -2,197 +2,68 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emoji Tree Showcase 🌴</title>
+<title>Interactive Tree</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
-    background: #e0f7fa;
-    margin: 0;
-    padding: 20px;
     display: flex;
     justify-content: center;
-  }
-
-  #tree {
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    height: 100vh;
+    background: linear-gradient(skyblue, white);
   }
-
-  /* Tree emoji as trunk */
-  .stem-emoji {
-    font-size: 120px;
-    margin-bottom: 20px;
-    transform: scale(0);
-    animation: growStem 1s forwards;
-    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  svg {
+    width: 500px;
+    height: 600px;
   }
-
-  @keyframes growStem {
-    to { transform: scale(1); }
-  }
-
-  /* Branches */
   .branch {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 60px;
-    position: relative;
-    margin-bottom: 60px;
-    opacity: 0;
-    transform: scale(0);
-    animation: growBranch 0.8s forwards;
+    stroke: saddlebrown;
+    stroke-width: 8;
+    fill: none;
   }
-
-  .branch:nth-child(1) { animation-delay: 1s; }
-  .branch:nth-child(2) { animation-delay: 1.8s; }
-
-  @keyframes growBranch {
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  .branch-name {
-    position: absolute;
-    top: -40px;
-    font-weight: bold;
-    text-align: center;
-    width: 100px;
-  }
-
-  /* Buttons */
-  button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-    border-radius: 12px;
-    border: 2px solid green;
-    background-color: #d4edda;
+  .leaf, .fruit {
     cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-    font-size: 14px;
-    position: relative;
+    transition: transform 0.2s;
   }
-
-  button img {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 5px;
-    object-fit: contain;
+  .leaf:hover {
+    transform: scale(1.2) rotate(-5deg);
   }
-
-  button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  }
-
-  /* Leaves sway */
-  button.leaf:hover {
-    animation: sway 1s infinite alternate;
-  }
-
-  @keyframes sway {
-    0% { transform: rotate(0deg); }
-    50% { transform: rotate(8deg); }
-    100% { transform: rotate(-8deg); }
-  }
-
-  /* Fruits pulse */
-  button.fruit {
-    border-color: orange;
-    background-color: #ffe0b2;
+  .fruit {
     animation: pulse 2s infinite;
   }
-
   @keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0px rgba(255,165,0,0.7);}
-    50% { transform: scale(1.15); box-shadow: 0 0 15px rgba(255,165,0,0.7);}
-    100% { transform: scale(1); box-shadow: 0 0 0px rgba(255,165,0,0.7);}
-  }
-
-  /* Popular click effect */
-  .popular {
-    transform: scale(1.25);
-    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
   }
 </style>
 </head>
 <body>
+<svg viewBox="0 0 500 600">
+  <!-- Trunk -->
+  <rect x="240" y="300" width="20" height="300" fill="saddlebrown"/>
 
-<div id="tree">
-  <div class="stem-emoji">🌴</div>
-  <div id="branches"></div>
-</div>
+  <!-- Branches -->
+  <path d="M250 300 C200 250, 150 200, 120 150" class="branch"/>
+  <path d="M250 300 C300 250, 350 200, 380 150" class="branch"/>
 
-<script>
-// Tree data
-const treeData = {
-  "branches": [
-    {
-      "name": "Electronics",
-      "leaves": [
-        {"name": "Laptop", "url": "#", "img": "https://img.icons8.com/color/96/000000/laptop.png"},
-        {"name": "Camera", "url": "#", "img": "https://img.icons8.com/color/96/000000/camera.png"}
-      ],
-      "fruits": [
-        {"name": "Laptop Promo", "url": "#", "img": "https://img.icons8.com/color/96/000000/apple.png"}
-      ]
-    },
-    {
-      "name": "Clothing",
-      "leaves": [
-        {"name": "T-Shirt", "url": "#", "img": "https://img.icons8.com/color/96/000000/t-shirt.png"},
-        {"name": "Jacket", "url": "#", "img": "https://img.icons8.com/color/96/000000/jacket.png"}
-      ],
-      "fruits": [
-        {"name": "Summer Sale", "url": "#", "img": "https://img.icons8.com/color/96/000000/cherries.png"}
-      ]
-    }
-  ]
-};
+  <!-- Leaves (internal links) -->
+  <a href="#electronics">
+    <circle class="leaf" cx="120" cy="150" r="20" fill="green"/>
+    <text x="120" y="150" text-anchor="middle" dy="5" fill="white" font-size="12">Electronics</text>
+  </a>
+  <a href="#clothing">
+    <circle class="leaf" cx="380" cy="150" r="20" fill="green"/>
+    <text x="380" y="150" text-anchor="middle" dy="5" fill="white" font-size="12">Clothing</text>
+  </a>
 
-const branchesContainer = document.getElementById('branches');
-const clickCount = {};
-
-treeData.branches.forEach((branch, index) => {
-  const branchDiv = document.createElement('div');
-  branchDiv.classList.add('branch');
-
-  const branchName = document.createElement('div');
-  branchName.classList.add('branch-name');
-  branchName.textContent = branch.name;
-  branchDiv.appendChild(branchName);
-
-  const allButtons = [...branch.leaves, ...branch.fruits];
-
-  allButtons.forEach(item => {
-    const btn = document.createElement('button');
-    btn.classList.add(branch.leaves.includes(item) ? 'leaf' : 'fruit');
-    btn.innerHTML = `<img src="${item.img}" alt="${item.name}"><span>${item.name}</span>`;
-
-    btn.onclick = () => {
-      clickCount[item.name] = (clickCount[item.name] || 0) + 1;
-      btn.classList.add('popular');
-      setTimeout(() => btn.classList.remove('popular'), 1000);
-
-      if (branch.leaves.includes(item)) {
-        location.href = item.url;
-      } else {
-        window.open(item.url, '_blank');
-      }
-
-      // Reorder by popularity
-      branchDiv.appendChild(btn);
-    };
-
-    branchDiv.appendChild(btn);
-  });
-
-  branchesContainer.appendChild(branchDiv);
-});
-</script>
-
+  <!-- Fruits (external promos) -->
+  <a href="https://promo1.com" target="_blank">
+    <circle class="fruit" cx="140" cy="180" r="15" fill="orange"/>
+    <text x="140" y="180" text-anchor="middle" dy="5" font-size="12">Ad</text>
+  </a>
+  <a href="https://promo2.com" target="_blank">
+    <circle class="fruit" cx="360" cy="180" r="15" fill="red"/>
+    <text x="360" y="180" text-anchor="middle" dy="5" font-size="12">Sale</text>
+  </a>
+</svg>
 </body>
-</html>
+  </html>

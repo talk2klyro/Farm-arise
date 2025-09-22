@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Interactive Tree Showcase</title>
+<title>Interactive Reactive Tree</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -20,17 +20,23 @@
     align-items: center;
   }
 
-  /* Stem / trunk */
+  /* Stem */
   .stem {
     width: 30px;
     height: 120px;
     background-color: #8b5a2b;
     border-radius: 10px;
-    position: relative;
     margin-bottom: 20px;
+    transform: scaleY(0);
+    transform-origin: bottom;
+    animation: growStem 1s forwards;
   }
 
-  /* Branch container */
+  @keyframes growStem {
+    to { transform: scaleY(1); }
+  }
+
+  /* Branches */
   .branch {
     display: flex;
     justify-content: center;
@@ -38,6 +44,17 @@
     gap: 80px;
     position: relative;
     margin-bottom: 60px;
+    opacity: 0;
+    transform: scale(0);
+    animation: growBranch 0.8s forwards;
+  }
+
+  .branch:nth-child(1) { animation-delay: 1s; }
+  .branch:nth-child(2) { animation-delay: 1.8s; }
+  .branch:nth-child(3) { animation-delay: 2.5s; }
+
+  @keyframes growBranch {
+    to { opacity: 1; transform: scale(1); }
   }
 
   .branch-name {
@@ -48,7 +65,7 @@
     width: 100px;
   }
 
-  /* Curved connecting lines (CSS pseudo-elements) */
+  /* Connecting lines */
   .branch::before {
     content: '';
     position: absolute;
@@ -61,7 +78,8 @@
     border-radius: 2px;
   }
 
-  .branch button {
+  /* Buttons */
+  button {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -75,8 +93,20 @@
     position: relative;
   }
 
-  /* Swaying leaves animation */
-  .branch button.leaf:hover {
+  button img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
+    object-fit: contain;
+  }
+
+  button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+
+  /* Swaying leaves */
+  button.leaf:hover {
     animation: sway 1s infinite alternate;
   }
 
@@ -99,11 +129,10 @@
     100% { transform: scale(1); box-shadow: 0 0 0px rgba(255,165,0,0.7);}
   }
 
-  button img {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 5px;
-    object-fit: contain;
+  /* Popularity effect */
+  .popular {
+    transform: scale(1.25);
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
   }
 </style>
 </head>
@@ -142,8 +171,9 @@ const treeData = {
 };
 
 const branchesContainer = document.getElementById('branches');
+const clickCount = {}; // track clicks for popularity
 
-treeData.branches.forEach(branch => {
+treeData.branches.forEach((branch, bIndex) => {
   const branchDiv = document.createElement('div');
   branchDiv.classList.add('branch');
 
@@ -152,21 +182,25 @@ treeData.branches.forEach(branch => {
   branchName.textContent = branch.name;
   branchDiv.appendChild(branchName);
 
-  // Leaves
-  branch.leaves.forEach(leaf => {
-    const btn = document.createElement('button');
-    btn.classList.add('leaf');
-    btn.innerHTML = `<img src="${leaf.img}" alt="${leaf.name}"><span>${leaf.name}</span>`;
-    btn.onclick = () => location.href = leaf.url;
-    branchDiv.appendChild(btn);
-  });
+  const allButtons = [...branch.leaves, ...branch.fruits];
 
-  // Fruits
-  branch.fruits.forEach(fruit => {
+  allButtons.forEach(item => {
     const btn = document.createElement('button');
-    btn.classList.add('fruit');
-    btn.innerHTML = `<img src="${fruit.img}" alt="${fruit.name}"><span>${fruit.name}</span>`;
-    btn.onclick = () => window.open(fruit.url, '_blank');
+    btn.classList.add(branch.leaves.includes(item) ? 'leaf' : 'fruit');
+    btn.innerHTML = `<img src="${item.img}" alt="${item.name}"><span>${item.name}</span>`;
+    btn.onclick = () => {
+      // Track popularity
+      clickCount[item.name] = (clickCount[item.name] || 0) + 1;
+      btn.classList.add('popular');
+      setTimeout(() => btn.classList.remove('popular'), 1000);
+
+      // Navigate
+      if (branch.leaves.includes(item)) location.href = item.url;
+      else window.open(item.url, '_blank');
+
+      // Optional: reorder based on popularity
+      branchDiv.appendChild(btn);
+    };
     branchDiv.appendChild(btn);
   });
 

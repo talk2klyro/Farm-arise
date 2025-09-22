@@ -1,84 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>3D Tree Navigation</title>
-  <style>
-    body { margin: 0; overflow: hidden; background: skyblue; }
-    canvas { display: block; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radial Showcase 🌐</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, #e0f7fa, #80deea);
+    font-family: Arial, sans-serif;
+  }
+
+  #radial {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
+
+  .node {
+    position: absolute;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+  }
+
+  .root {
+    width: 120px;
+    height: 120px;
+    background: #00796b;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .branch {
+    width: 90px;
+    height: 90px;
+    background: #43a047;
+    color: white;
+    font-size: 14px;
+  }
+
+  .leaf {
+    width: 70px;
+    height: 70px;
+    background: #aed581;
+    font-size: 12px;
+  }
+
+  .fruit {
+    width: 70px;
+    height: 70px;
+    background: #ffb74d;
+    font-size: 12px;
+    animation: pulse 2s infinite;
+  }
+
+  .node:hover {
+    transform: scale(1.2);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    z-index: 10;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,165,0,0.6); }
+    50% { transform: scale(1.15); box-shadow: 0 0 20px rgba(255,165,0,0.6); }
+    100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,165,0,0.6); }
+  }
+</style>
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+
+<div id="radial"></div>
 
 <script>
-// Scene setup
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.set(0, 5, 12);
+const data = {
+  root: { name: "Main 🌐" },
+  branches: [
+    {
+      name: "Electronics",
+      leaves: [
+        { name: "Laptop 💻", url: "#" },
+        { name: "Camera 📷", url: "#" }
+      ],
+      fruits: [
+        { name: "Laptop Promo 🍎", url: "#" }
+      ]
+    },
+    {
+      name: "Clothing",
+      leaves: [
+        { name: "T-Shirt 👕", url: "#" },
+        { name: "Jacket 🧥", url: "#" }
+      ],
+      fruits: [
+        { name: "Summer Sale 🍒", url: "#" }
+      ]
+    }
+  ]
+};
 
-const renderer = new THREE.WebGLRenderer({antialias: true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+const radial = document.getElementById("radial");
 
-// Controls
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+// Root node
+const root = document.createElement("div");
+root.className = "node root";
+root.textContent = data.root.name;
+radial.appendChild(root);
 
-// Lighting
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(5, 10, 7);
-scene.add(light);
-scene.add(new THREE.AmbientLight(0x404040));
+// Place branches in circle
+const branchCount = data.branches.length;
+const radius = 180;
 
-// Trunk
-const trunkGeo = new THREE.CylinderGeometry(0.5, 0.8, 5, 8);
-const trunkMat = new THREE.MeshStandardMaterial({color: 0x8B5A2B});
-const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-scene.add(trunk);
+data.branches.forEach((branch, i) => {
+  const angle = (i / branchCount) * 2 * Math.PI;
+  const branchNode = document.createElement("div");
+  branchNode.className = "node branch";
+  branchNode.textContent = branch.name;
+  branchNode.style.left = `${250 + radius * Math.cos(angle) - 45}px`;
+  branchNode.style.top = `${250 + radius * Math.sin(angle) - 45}px`;
+  radial.appendChild(branchNode);
 
-// Leaves (sphere crown)
-const leavesGeo = new THREE.SphereGeometry(3, 32, 32);
-const leavesMat = new THREE.MeshStandardMaterial({color: 0x228B22, roughness: 0.7});
-const leaves = new THREE.Mesh(leavesGeo, leavesMat);
-leaves.position.y = 3;
-scene.add(leaves);
+  // Leaves + fruits around branch
+  const items = [...branch.leaves.map(l => ({...l, type: "leaf"})),
+                 ...branch.fruits.map(f => ({...f, type: "fruit"}))];
+  const itemRadius = 100;
 
-// Fruits (spheres)
-const fruits = [];
-const fruitGeo = new THREE.SphereGeometry(0.2, 16, 16);
-const fruitColors = [0xff0000, 0xffa500, 0xffff00, 0x00ff00];
+  items.forEach((item, j) => {
+    const subAngle = (j / items.length) * 2 * Math.PI;
+    const itemNode = document.createElement("div");
+    itemNode.className = `node ${item.type}`;
+    itemNode.textContent = item.name;
+    itemNode.style.left = `${parseFloat(branchNode.style.left) + 45 + itemRadius * Math.cos(subAngle) - 35}px`;
+    itemNode.style.top = `${parseFloat(branchNode.style.top) + 45 + itemRadius * Math.sin(subAngle) - 35}px`;
 
-for (let i = 0; i < 8; i++) {
-  const fruitMat = new THREE.MeshStandardMaterial({color: fruitColors[Math.floor(Math.random()*fruitColors.length)]});
-  const fruit = new THREE.Mesh(fruitGeo, fruitMat);
-  
-  // Random position around the crown
-  const angle = Math.random() * Math.PI * 2;
-  const radius = 2.5 + Math.random() * 0.3;
-  const height = 2.5 + Math.random() * 1.0;
-  fruit.position.set(Math.cos(angle) * radius, height, Math.sin(angle) * radius);
-  
-  fruits.push(fruit);
-  scene.add(fruit);
-}
+    itemNode.onclick = () => {
+      if (item.type === "fruit") {
+        window.open(item.url, "_blank");
+      } else {
+        location.href = item.url;
+      }
+    };
 
-// Animate
-function animate() {
-  requestAnimationFrame(animate);
-  leaves.rotation.y += 0.001;
-  fruits.forEach(f => f.rotation.y += 0.01);
-  controls.update();
-  renderer.render(scene, camera);
-}
-animate();
-
-// Resize handling
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+    radial.appendChild(itemNode);
+  });
 });
 </script>
+
 </body>
 </html>

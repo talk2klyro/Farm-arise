@@ -1,116 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radial Showcase 🌐</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Responsive Radial Showcase 🌐</title>
 <style>
-  body {
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: radial-gradient(circle at center, #e0f7fa, #80deea);
-    font-family: Arial, sans-serif;
+  :root{
+    --radial-size: 600px;     /* JS will override for responsiveness */
+    --root-size: 140px;
+    --branch-size: 100px;
+    --item-size: 70px;
+    --branch-radius: 200px;
+    --item-radius: 100px;
+    --orbit-duration: 14s;
+  }
+
+  html,body{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:radial-gradient(circle at center,#e0f7fa,#80deea);}
+
+  .wrap {
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    box-sizing:border-box;
   }
 
   #radial {
     position: relative;
-    width: 600px;
-    height: 600px;
+    width: var(--radial-size);
+    height: var(--radial-size);
+    touch-action: manipulation;
   }
 
-  .node {
-    position: absolute;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
-    text-align: center;
-    padding: 8px;
-    line-height: 1.2;
+  .node{
+    position:absolute;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:8px;
+    line-height:1.15;
+    user-select:none;
+    -webkit-user-select:none;
+    transition: transform .22s ease, box-shadow .22s ease, opacity .35s ease;
+    will-change: transform;
+    box-sizing:border-box;
+    cursor:pointer;
   }
 
-  .root {
-    width: 140px;
-    height: 140px;
-    background: #00796b;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    animation: breathe 3s infinite;
-    z-index: 10;
+  /* root center */
+  .root{
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    width:var(--root-size);
+    height:var(--root-size);
+    background:#00796b;
+    color:#fff;
+    box-shadow:0 6px 18px rgba(0,0,0,.25);
+    font-weight:700;
+    font-size:calc(var(--root-size) * 0.14);
+    z-index:20;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    border:3px solid rgba(255,255,255,0.06);
+    outline: none;
   }
 
-  @keyframes breathe {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -50%) scale(1.08); }
+  .root .hint { font-size: .8em; opacity:.95; line-height:1; }
+
+  .node:focus { box-shadow:0 10px 28px rgba(0,0,0,.32); transform: translate(-50%,-50%) scale(1.06); }
+
+  .branch{
+    width:var(--branch-size);
+    height:var(--branch-size);
+    background:#43a047;
+    color:#fff;
+    font-size: calc(var(--branch-size) * 0.12);
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
+    opacity:0;
+    pointer-events:none;
+    z-index:15;
+  }
+  .branch.active{ opacity:1; pointer-events:auto; }
+
+  /* orbiter container (children rotate around this center) */
+  .orbiter{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:0;
+    height:0;
+    transform-origin:center;
+    pointer-events:none; /* allow events on child nodes */
   }
 
-  .branch {
-    width: 100px;
-    height: 100px;
-    background: #43a047;
-    color: white;
-    font-size: 14px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.8s ease;
+  .orbiter.spin{ animation: rotate var(--orbit-duration) linear infinite; }
+
+  @keyframes rotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  .item {
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:var(--item-size);
+    height:var(--item-size);
+    margin:0;
+    transform-origin: center;
+    box-shadow:0 6px 18px rgba(0,0,0,.14);
+    font-size: calc(var(--item-size) * 0.14);
+    color:#111;
+    background:#aed581;
+    pointer-events:auto;
   }
 
-  .branch.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .leaf {
-    width: 70px;
-    height: 70px;
-    background: #aed581;
-    font-size: 12px;
-    animation: orbit 12s linear infinite;
-  }
-
-  .fruit {
-    width: 70px;
-    height: 70px;
-    background: #ffb74d;
-    font-size: 12px;
-    animation: orbit 15s linear infinite, pulse 2s infinite;
-  }
-
-  .node:hover {
-    transform: scale(1.2);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    z-index: 10;
-  }
-
+  .fruit { background: #ffb74d; animation: pulse 2s ease-in-out infinite; }
   @keyframes pulse {
-    0% { box-shadow: 0 0 0 rgba(255,165,0,0.6); }
-    50% { box-shadow: 0 0 20px rgba(255,165,0,0.8); }
-    100% { box-shadow: 0 0 0 rgba(255,165,0,0.6); }
+    0% { box-shadow:0 0 0 rgba(255,165,0,0.4); }
+    50% { box-shadow:0 0 18px rgba(255,165,0,0.65); }
+    100%{ box-shadow:0 0 0 rgba(255,165,0,0.4); }
   }
 
-  @keyframes orbit {
-    from { transform: rotate(0deg) translateX(100px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+  /* hover/tap affordance */
+  .node:hover, .node.touch-active { transform: translate(-50%,-50%) scale(1.12); z-index:30; }
+
+  /* sizes / responsiveness tweaks */
+  @media (max-width: 700px) {
+    :root{
+      --radial-size: calc(min(92vw, 520px));
+      --root-size: calc(var(--radial-size) * 0.22);
+      --branch-size: calc(var(--radial-size) * 0.14);
+      --item-size: calc(var(--radial-size) * 0.11);
+      --branch-radius: calc(var(--radial-size) * 0.34);
+      --item-radius: calc(var(--radial-size) * 0.14);
+      --orbit-duration: 18s;
+    }
+  }
+
+  @media (min-width: 701px) {
+    :root{
+      --radial-size: calc(min(90vw, 700px));
+      --root-size: 140px;
+      --branch-size: 100px;
+      --item-size: 70px;
+      --branch-radius: 200px;
+      --item-radius: 100px;
+      --orbit-duration: 14s;
+    }
+  }
+
+  /* instruction caption */
+  .caption {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background:rgba(0,0,0,0.6);
+    color:#fff;padding:8px 12px;border-radius:12px;font-size:14px;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);
   }
 </style>
 </head>
 <body>
+<div class="wrap">
+  <div id="radial" aria-label="Radial showcase"></div>
+</div>
 
-<div id="radial"></div>
+<div class="caption">Tap the center to expand / collapse • Items with 🎁 are promos</div>
 
 <script>
+/* ---------- DATA ---------- */
 const data = {
-  root: { name: "Main 🌐\n(Tap me 🌟)" },
+  root: { name: "Main 🌐", hint: "(Tap to explore 🌟)" },
   branches: [
     {
       name: "Electronics 👉",
@@ -131,73 +196,205 @@ const data = {
       fruits: [
         { name: "Summer Sale 🍒\n(Deal ✨)", url: "#" }
       ]
+    },
+    {
+      name: "Home 👉",
+      leaves: [
+        { name: "Lamp 💡\n(Click 🖱️)", url: "#" },
+        { name: "Rug 🧶\n(Click 🖱️)", url: "#" }
+      ],
+      fruits: [
+        { name: "Decor Promo 🎁\n(Deal ✨)", url: "#" }
+      ]
     }
   ]
 };
 
-const radial = document.getElementById("radial");
+/* ---------- RENDER & RESPONSIVENESS ---------- */
+const radial = document.getElementById('radial');
 
-// Root node
-const root = document.createElement("div");
-root.className = "node root";
-root.textContent = data.root.name;
-radial.appendChild(root);
+let branchNodes = [];
+let expanded = false;
 
-let branchesVisible = false;
-const branchNodes = [];
+function clearRadial(){
+  radial.innerHTML = '';
+}
 
-// Place branches in circle (but keep hidden until root clicked)
-const branchCount = data.branches.length;
-const radius = 200;
+// create root button (always present)
+function renderRoot(){
+  const root = document.createElement('div');
+  root.className = 'node root';
+  root.setAttribute('role','button');
+  root.setAttribute('tabindex','0');
+  root.setAttribute('aria-pressed', 'false');
+  root.innerHTML = `<div style="font-weight:800">${data.root.name}</div><div class="hint" style="opacity:.95;margin-top:6px;font-weight:600;font-size:0.85em">${data.root.hint}</div>`;
+  radial.appendChild(root);
 
-data.branches.forEach((branch, i) => {
-  const angle = (i / branchCount) * 2 * Math.PI;
-  const branchNode = document.createElement("div");
-  branchNode.className = "node branch";
-  branchNode.textContent = branch.name;
-  branchNode.style.left = `${300 + radius * Math.cos(angle) - 50}px`;
-  branchNode.style.top = `${300 + radius * Math.sin(angle) - 50}px`;
-  radial.appendChild(branchNode);
+  // click/touch to toggle branches
+  root.addEventListener('click', toggleBranches);
+  root.addEventListener('touchstart', (e)=>{ e.preventDefault(); toggleBranches(); });
 
-  // Leaves + fruits around branch
-  const items = [...branch.leaves.map(l => ({...l, type: "leaf"})),
-                 ...branch.fruits.map(f => ({...f, type: "fruit"}))];
-
-  items.forEach((item, j) => {
-    const itemNode = document.createElement("div");
-    itemNode.className = `node ${item.type}`;
-    itemNode.textContent = item.name;
-
-    // Position relative to branch center
-    itemNode.style.left = `${parseFloat(branchNode.style.left) + 50}px`;
-    itemNode.style.top = `${parseFloat(branchNode.style.top) + 50}px`;
-
-    itemNode.onclick = () => {
-      if (item.type === "fruit") {
-        window.open(item.url, "_blank");
-      } else {
-        location.href = item.url;
-      }
-    };
-
-    branchNode.appendChild(itemNode);
+  // keyboard support
+  root.addEventListener('keydown', (e)=> {
+    if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBranches(); }
   });
 
-  branchNodes.push(branchNode);
-});
+  return root;
+}
 
-// Toggle branches when root is clicked
-root.onclick = () => {
-  branchesVisible = !branchesVisible;
-  branchNodes.forEach(b => {
-    if (branchesVisible) {
-      b.classList.add("active");
+function toggleBranches(){
+  expanded = !expanded;
+  branchNodes.forEach(b=>{
+    if(expanded){
+      b.element.classList.add('active');
+      b.element.setAttribute('aria-hidden','false');
     } else {
-      b.classList.remove("active");
+      b.element.classList.remove('active');
+      b.element.setAttribute('aria-hidden','true');
     }
   });
-};
-</script>
+  // update aria
+  const root = radial.querySelector('.root');
+  if(root) root.setAttribute('aria-pressed', expanded ? 'true' : 'false');
+}
 
+/* compute sizes from CSS variables (after CSS applied) */
+function pxVar(name){
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+}
+
+function buildBranches(){
+  branchNodes = [];
+  const size = parseFloat(getComputedStyle(radial).width);
+  const center = { x: size/2, y: size/2 };
+  const branchRadius = pxVar('--branch-radius') || Math.min(size/2.5, 200);
+  const itemRadius = pxVar('--item-radius') || Math.min(size/4.5, 100);
+
+  const branchCount = data.branches.length;
+
+  data.branches.forEach((branch, idx) => {
+    // compute branch center
+    const angle = (idx / branchCount) * Math.PI * 2 - Math.PI/2; // start from top
+    const bx = center.x + branchRadius * Math.cos(angle);
+    const by = center.y + branchRadius * Math.sin(angle);
+
+    // create branch element
+    const b = document.createElement('div');
+    b.className = 'node branch';
+    b.style.left = `${bx}px`;
+    b.style.top = `${by}px`;
+    b.setAttribute('aria-hidden','true');
+    b.setAttribute('role','group');
+    b.setAttribute('tabindex','-1');
+    b.textContent = branch.name;
+
+    // orbiter (children rotate around this)
+    const orbiter = document.createElement('div');
+    orbiter.className = 'orbiter spin';
+    orbiter.style.setProperty('--orb-duration', getComputedStyle(document.documentElement).getPropertyValue('--orbit-duration'));
+
+    // items = leaves + fruits
+    const items = [...branch.leaves.map(l=>({...l,type:'leaf'})),
+                   ...branch.fruits.map(f=>({...f,type:'fruit'}))];
+
+    const itemCount = items.length || 1;
+    const baseAngle = -90; // degrees start at top relative to branch center
+
+    items.forEach((it, j) => {
+      // angle for this child around branch
+      const deg = baseAngle + (j / itemCount) * 360;
+      const rad = deg * (Math.PI/180);
+      const el = document.createElement('button'); // use button for accessibility
+      el.className = `node item ${it.type}`;
+      el.style.width = getComputedStyle(document.documentElement).getPropertyValue('--item-size');
+      el.style.height = getComputedStyle(document.documentElement).getPropertyValue('--item-size');
+      el.style.left = `0px`;
+      el.style.top = `0px`;
+      el.style.padding = '6px';
+      el.style.border = 'none';
+      el.style.borderRadius = '12px';
+      el.style.background = it.type === 'fruit' ? 'var(--fruit-bg,#ffb74d)' : 'var(--leaf-bg,#aed581)';
+      el.style.transform = `rotate(${deg}deg) translateX(${itemRadius}px) rotate(${-deg}deg)`;
+      el.style.fontSize = `calc(${getComputedStyle(document.documentElement).getPropertyValue('--item-size')} * 0.14)`;
+      el.innerText = it.name;
+      el.setAttribute('aria-label', it.name.replace('\n',' '));
+      el.setAttribute('type','button');
+
+      // touch-friendly: increase hit area slightly
+      el.style.minWidth = getComputedStyle(document.documentElement).getPropertyValue('--item-size');
+      el.style.minHeight = getComputedStyle(document.documentElement).getPropertyValue('--item-size');
+
+      // click behavior
+      el.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        // small visual feedback
+        el.classList.add('touch-active');
+        setTimeout(()=> el.classList.remove('touch-active'), 350);
+
+        if(it.type === 'fruit'){
+          window.open(it.url,'_blank');
+        } else {
+          // internal navigation (demo placeholder)
+          alert('Navigate to: ' + it.name.split('\n')[0]);
+          // location.href = it.url; // enable for real links
+        }
+      });
+
+      // keyboard
+      el.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+      });
+
+      // append item to orbiter
+      orbiter.appendChild(el);
+    });
+
+    // position orbiter centered on branch
+    orbiter.style.left = '50%';
+    orbiter.style.top = '50%';
+    orbiter.style.transform = 'translate(-50%,-50%)';
+
+    b.appendChild(orbiter);
+    radial.appendChild(b);
+
+    branchNodes.push({ element: b, orbiter, angle, bx, by });
+  });
+}
+
+/* render everything */
+function render(){
+  clearRadial();
+  renderRoot();
+  buildBranches();
+  // start with collapsed state
+  expanded = false;
+}
+
+/* recalc on resize */
+let resizeTimer = null;
+function onResize(){
+  // re-evaluate CSS variables by forcing re-render
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(()=> {
+    // set radial size dynamically (keeps it inside viewport nicely)
+    const vw = Math.min(window.innerWidth * 0.92, 840);
+    const vh = Math.min(window.innerHeight * 0.82, 840);
+    const size = Math.min(vw, vh);
+    radial.style.width = `${size}px`;
+    radial.style.height = `${size}px`;
+    // rebuild because positions depend on size and CSS vars
+    render();
+  }, 120);
+}
+
+/* initial render & listeners */
+window.addEventListener('load', ()=>{
+  // initial sizing similar to CSS media queries but keep JS in control for perfect fit
+  onResize();
+});
+
+window.addEventListener('resize', onResize);
+window.addEventListener('orientationchange', onResize);
+</script>
 </body>
 </html>

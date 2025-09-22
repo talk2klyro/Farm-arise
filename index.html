@@ -4,19 +4,182 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic Tree Showcase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e0f7fa;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-  <!-- Link to CSS -->
-  <link rel="stylesheet" href="style.css">
+    /* Tree container */
+    #tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Stem / trunk */
+    .stem {
+      width: 30px;
+      height: 120px;
+      background-color: #8b5a2b;
+      border-radius: 10px;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    /* Branch container */
+    .branch {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 50px;
+      position: relative;
+      margin-bottom: 40px;
+    }
+
+    /* Connect branches to stem */
+    .branch::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      width: 4px;
+      height: 40px;
+      background: #8b5a2b;
+      transform: translateX(-50%);
+    }
+
+    .branch-name {
+      position: absolute;
+      top: -60px;
+      font-weight: bold;
+      text-align: center;
+      width: 100px;
+    }
+
+    /* Leaves and fruits buttons */
+    button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border-radius: 12px;
+      border: 2px solid green;
+      background-color: #d4edda;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      font-size: 14px;
+    }
+
+    button img {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 5px;
+      object-fit: contain;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    button.fruit {
+      border-color: orange;
+      background-color: #ffe0b2;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0px rgba(255,165,0,0.7);}
+      50% { box-shadow: 0 0 15px rgba(255,165,0,0.7);}
+      100% { box-shadow: 0 0 0px rgba(255,165,0,0.7);}
+    }
+
+    /* Optional curved branches using pseudo elements */
+    .branch button {
+      position: relative;
+    }
+    .branch button::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      width: 2px;
+      height: 40px;
+      background: #8b5a2b;
+      transform: translateX(-50%);
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Tree container -->
   <div id="tree">
-    <div class="stem">🌳 Main Showcase</div>
+    <div class="stem"></div>
     <div id="branches"></div>
   </div>
 
-  <!-- Script for dynamic tree rendering -->
-  <script src="script.js"></script>
+  <script>
+    // Standalone JSON data
+    const treeData = {
+      "branches": [
+        {
+          "name": "Electronics",
+          "leaves": [
+            {"name": "Laptop", "url": "#", "img": "https://img.icons8.com/color/96/000000/laptop.png"},
+            {"name": "Camera", "url": "#", "img": "https://img.icons8.com/color/96/000000/camera.png"}
+          ],
+          "fruits": [
+            {"name": "Laptop Promo", "url": "#", "img": "https://img.icons8.com/color/96/000000/apple.png"}
+          ]
+        },
+        {
+          "name": "Clothing",
+          "leaves": [
+            {"name": "T-Shirt", "url": "#", "img": "https://img.icons8.com/color/96/000000/t-shirt.png"},
+            {"name": "Jacket", "url": "#", "img": "https://img.icons8.com/color/96/000000/jacket.png"}
+          ],
+          "fruits": [
+            {"name": "Summer Sale", "url": "#", "img": "https://img.icons8.com/color/96/000000/cherries.png"}
+          ]
+        }
+      ]
+    };
+
+    const branchesContainer = document.getElementById('branches');
+
+    treeData.branches.forEach(branch => {
+      const branchDiv = document.createElement('div');
+      branchDiv.classList.add('branch');
+
+      const branchName = document.createElement('div');
+      branchName.classList.add('branch-name');
+      branchName.textContent = branch.name;
+      branchDiv.appendChild(branchName);
+
+      // Render leaves
+      branch.leaves.forEach(leaf => {
+        const btn = document.createElement('button');
+        btn.innerHTML = `<img src="${leaf.img}" alt="${leaf.name}"><span>${leaf.name}</span>`;
+        btn.onclick = () => location.href = leaf.url;
+        branchDiv.appendChild(btn);
+      });
+
+      // Render fruits
+      branch.fruits.forEach(fruit => {
+        const btn = document.createElement('button');
+        btn.classList.add('fruit');
+        btn.innerHTML = `<img src="${fruit.img}" alt="${fruit.name}"><span>${fruit.name}</span>`;
+        btn.onclick = () => window.open(fruit.url, '_blank');
+        branchDiv.appendChild(btn);
+      });
+
+      branchesContainer.appendChild(branchDiv);
+    });
+  </script>
+
 </body>
-</html>
+  </html>

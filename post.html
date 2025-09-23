@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Post</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f9f9f9;
+      color: #222;
+      line-height: 1.6;
+    }
+    header {
+      background: #0077b6;
+      color: #fff;
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .post-cover {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+    .content h2 {
+      margin-top: 1.5rem;
+      color: #0077b6;
+    }
+    .content a {
+      color: #0077b6;
+      text-decoration: none;
+    }
+    .content a:hover {
+      text-decoration: underline;
+    }
+    .back-home {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.6rem 1.2rem;
+      background: #0077b6;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="post-title">Loading...</h1>
+  </header>
+
+  <main class="container">
+    <img id="post-image" class="post-cover" src="" alt="">
+    <div id="post-content" class="content"></div>
+    <a href="index.html" class="back-home">← Back to Home</a>
+  </main>
+
+  <footer>
+    &copy; <span id="year"></span> My Blog. All rights reserved.
+  </footer>
+
+  <!-- Marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    // get post id from URL
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get('id');
+
+    fetch('data.json')
+      .then(res => res.json())
+      .then(posts => {
+        const post = posts.find(p => p.id == postId);
+        if (!post) {
+          document.getElementById('post-title').textContent = 'Post Not Found';
+          return;
+        }
+
+        document.title = post.title + ' | My Blog';
+        document.getElementById('post-title').textContent = post.title;
+        document.getElementById('post-image').src = post.image;
+        document.getElementById('post-image').alt = post.title;
+
+        // render markdown
+        document.getElementById('post-content').innerHTML = marked.parse(post.content);
+      });
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

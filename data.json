@@ -1,42 +1,38 @@
 [
   {
     "id": 1,
-    "title": "Dheeja Store",
-    "excerpt": "Discover the Dheeja Store – your place for unique collections and online shopping.",
-    "image": "https://i.postimg.cc/3WYWQ5qX/8906e69e882131bcadda6ed996ac695c.jpg",
-    "url": "https://dheeja-store.vercel.app",
-    "content": "Welcome to **Dheeja Store** 🌐\n\nYour one-stop shop for modern products and collections. Explore categories, find deals, and enjoy a smooth online shopping experience.\n\n👉 Visit the site: [Dheeja Store](https://dheeja-store.vercel.app)"
+    "title": "Post 1",
+    "excerpt": "A visual story begins here with the first uploaded image.",
+    "image": "https://i.postimg.cc/z3BJqDmJ/0053f21ea2aa000f4d24fc3d7baa5c3f.jpg",
+    "content": "# Post 1\n\nThis is the start of the journey with my blog. \n\n![cover](https://i.postimg.cc/z3BJqDmJ/0053f21ea2aa000f4d24fc3d7baa5c3f.jpg)"
   },
   {
     "id": 2,
-    "title": "IB Abaya",
-    "excerpt": "Elegant Abayas and fashion clothing tailored for every occasion.",
-    "image": "https://i.postimg.cc/9rfMzPCz/d7928186887071adbdd5bd26ead74653.jpg",
-    "url": "https://ib-abaya.vercel.app/",
-    "content": "**IB Abaya** 🧕\n\nDiscover a collection of elegant abayas and modest fashion designs. Perfect for all occasions and crafted with style in mind.\n\n👉 Visit the site: [IB Abaya](https://ib-abaya.vercel.app/)"
+    "title": "Post 2",
+    "excerpt": "Another entry with my next uploaded image.",
+    "image": "https://i.postimg.cc/PCzGm0G3/03533a2ae0c28308d159919108dd9492.jpg",
+    "content": "# Post 2\n\nSharing my second update in this blog series.\n\n![cover](https://i.postimg.cc/PCzGm0G3/03533a2ae0c28308d159919108dd9492.jpg)"
   },
   {
     "id": 3,
-    "title": "Readify",
-    "excerpt": "Readify – where reading meets simplicity and clarity.",
-    "image": "https://i.postimg.cc/xq580prW/f543d86d2caf4f9925aa2611d8171374.jpg",
-    "url": "https://readify-rust.vercel.app",
-    "content": "Welcome to **Readify** 📚\n\nAn online reading platform that focuses on simplicity, readability, and user-friendly design. Great for blogs, articles, and learning.\n\n👉 Visit the site: [Readify](https://readify-rust.vercel.app)"
+    "title": "Post 3",
+    "excerpt": "Turning blog posts into a visual journal.",
+    "image": "https://i.postimg.cc/0rB9jgx7/06c18964f037c762c7bb37772681b258.jpg",
+    "content": "# Post 3\n\nHere’s another step in my blog journey.\n\n![cover](https://i.postimg.cc/0rB9jgx7/06c18964f037c762c7bb37772681b258.jpg)"
   },
   {
     "id": 4,
-    "title": "Cyberman",
-    "excerpt": "A futuristic showcase – Cyberman explores technology and digital worlds.",
-    "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg",
-    "url": "https://cyberman-jet.vercel.app",
-    "content": "**Cyberman** 🤖\n\nExplore futuristic design concepts and projects around technology, digital showcases, and innovation.\n\n👉 Visit the site: [Cyberman](https://cyberman-jet.vercel.app)"
+    "title": "Post 4",
+    "excerpt": "Captured moments continue with fresh imagery.",
+    "image": "https://i.postimg.cc/7Ghpr65d/09b344a7314bead03ed77da586cda314.jpg",
+    "content": "# Post 4\n\nBlogging visually and sharing new ideas.\n\n![cover](https://i.postimg.cc/7Ghpr65d/09b344a7314bead03ed77da586cda314.jpg)"
   },
   {
     "id": 5,
-    "title": "Alhaji Mohammed",
-    "excerpt": "Personal site for Alhaji Mohammed – insights, projects, and more.",
-    "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg",
-    "url": "https://alhaji-mohammed.vercel.app/index.html",
-    "content": "Welcome to **Alhaji Mohammed's website** 🌟\n\nA personal space with projects, insights, and more.\n\n👉 Visit the site: [Alhaji Mohammed](https://alhaji-mohammed.vercel.app/index.html)"
+    "title": "Post 5",
+    "excerpt": "Continuing the blog series with style and images.",
+    "image": "https://i.postimg.cc/pp3V0w6P/0a3ccabd5c61ba948d82a2a3c40fa812.jpg",
+    "content": "# Post 5\n\nEach blog post grows this journey further.\n\n![cover](https://i.postimg.cc/pp3V0w6P/0a3ccabd5c61ba948d82a2a3c40fa812.jpg)"
   }
+  // … continue like this for all images …
 ]

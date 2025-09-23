@@ -3,19 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog Front 🌐</title>
+  <title>🌐 My Blog Front</title>
   <style>
     body {
       margin: 0;
       font-family: Inter, Arial, sans-serif;
       background: linear-gradient(to bottom right, #e0f7fa, #80deea);
-      padding: 20px;
+      padding-top: 70px; /* space for fixed header */
     }
 
-    h1, h2 {
+    /* Floating Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #004d40;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #80deea;
+    }
+
+    h2 {
       color: #004d40;
       text-align: center;
       margin-bottom: 20px;
+      margin-top: 50px;
     }
 
     .section {
@@ -28,8 +62,10 @@
       gap: 20px;
       max-width: 1200px;
       margin: 0 auto;
+      padding: 0 20px;
     }
 
+    /* Card styles */
     .card {
       background: #fff;
       border-radius: 16px;
@@ -38,6 +74,16 @@
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       display: flex;
       flex-direction: column;
+
+      /* Animation start */
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .card:hover {
@@ -49,6 +95,14 @@
       width: 100%;
       height: 180px;
       object-fit: cover;
+      display: block;
+      background: #f0f0f0;
+      transition: filter 0.4s ease;
+      filter: blur(8px);
+    }
+
+    .card img.loaded {
+      filter: blur(0);
     }
 
     .card-body {
@@ -91,21 +145,33 @@
     .card a:hover {
       background: #004d40;
     }
+
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+    }
   </style>
 </head>
 <body>
-  <h1>🌐 Farm Rise</h1>
+  <!-- Header -->
+  <header>
+    <h1>🌐 My Blog</h1>
+    <nav>
+      <a href="#projects">Projects</a>
+      <a href="#posts">Blog Posts</a>
+    </nav>
+  </header>
 
   <!-- Projects Section -->
-  <div class="section">
+  <div class="section" id="projects">
     <h2>Projects</h2>
-    <div class="grid" id="projects"></div>
+    <div class="grid"></div>
   </div>
 
   <!-- Blog Posts Section -->
-  <div class="section">
+  <div class="section" id="posts">
     <h2>Blog Posts</h2>
-    <div class="grid" id="posts"></div>
+    <div class="grid"></div>
   </div>
 
   <script>
@@ -114,34 +180,60 @@
         const response = await fetch("data.json");
         const data = await response.json();
 
-        const projectsGrid = document.getElementById("projects");
-        data.projects.forEach(project => {
+        function createCard(content) {
           const card = document.createElement("div");
           card.className = "card";
-          card.innerHTML = `
-            <img src="${project.image}" alt="${project.title}">
-            <div class="card-body">
-              <h3>${project.title}</h3>
-              <a href="${project.url}" target="_blank">Visit Site</a>
-            </div>
-          `;
-          projectsGrid.appendChild(card);
+
+          const img = document.createElement("img");
+          img.src = content.image;
+          img.alt = content.title;
+          img.loading = "lazy";
+          img.addEventListener("load", () => img.classList.add("loaded"));
+
+          const body = document.createElement("div");
+          body.className = "card-body";
+
+          if (content.date) {
+            body.innerHTML = `
+              <h3>${content.title}</h3>
+              <small>${content.date}</small>
+              <p>${content.excerpt}</p>
+              <a href="${content.url}" target="_blank">Read More</a>
+            `;
+          } else {
+            body.innerHTML = `
+              <h3>${content.title}</h3>
+              <a href="${content.url}" target="_blank">Visit Site</a>
+            `;
+          }
+
+          card.appendChild(img);
+          card.appendChild(body);
+          return card;
+        }
+
+        const projectsGrid = document.querySelector("#projects .grid");
+        data.projects.forEach(project => {
+          projectsGrid.appendChild(createCard(project));
         });
 
-        const postsGrid = document.getElementById("posts");
+        const postsGrid = document.querySelector("#posts .grid");
         data.posts.forEach(post => {
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <img src="${post.image}" alt="${post.title}">
-            <div class="card-body">
-              <h3>${post.title}</h3>
-              <small>${post.date}</small>
-              <p>${post.excerpt}</p>
-              <a href="${post.url}" target="_blank">Read More</a>
-            </div>
-          `;
-          postsGrid.appendChild(card);
+          postsGrid.appendChild(createCard(post));
+        });
+
+        // Fade-in observer
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll(".card").forEach(card => {
+          observer.observe(card);
         });
 
       } catch (err) {
@@ -152,4 +244,4 @@
     loadData();
   </script>
 </body>
-  </html>
+</html>

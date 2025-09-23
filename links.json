@@ -1,0 +1,148 @@
+{
+  "updatedAt": "2025-09-23T00:00:00Z",
+  "links": [
+    {
+      "id": "l1",
+      "title": "Laptop Deal — 20% OFF",
+      "url": "https://example.com/laptop",
+      "img": "https://img.icons8.com/fluency/96/000000/laptop.png",
+      "category": "Electronics",
+      "tags": ["tech","hardware"],
+      "hintEmoji": "🎁",
+      "type": "fruit",
+      "description": "Limited-time laptop promotion — click to view the deal."
+    },
+    {
+      "id": "l2",
+      "title": "Camera Review: Top 5",
+      "url": "https://example.com/camera-review",
+      "img": "https://img.icons8.com/fluency/96/000000/camera.png",
+      "category": "Electronics",
+      "tags": ["review","photography"],
+      "hintEmoji": "🤔",
+      "type": "leaf",
+      "description": "In-depth camera reviews to help you decide."
+    },
+    {
+      "id": "l3",
+      "title": "Cool T-Shirt",
+      "url": "https://example.com/tshirt",
+      "img": "https://img.icons8.com/fluency/96/000000/t-shirt.png",
+      "category": "Clothing",
+      "tags": ["fashion"],
+      "hintEmoji": "👍",
+      "type": "leaf",
+      "description": "Comfortable graphic tee."
+    },
+    {
+      "id": "l4",
+      "title": "Summer Sale - Jackets",
+      "url": "https://example.com/jackets",
+      "img": "https://img.icons8.com/fluency/96/000000/jacket.png",
+      "category": "Clothing",
+      "tags": ["sale","seasonal"],
+      "hintEmoji": "🎁",
+      "type": "fruit",
+      "description": "Seasonal jackets sale — limited stock."
+    },
+    {
+      "id": "l5",
+      "title": "Travel Guide: Bali",
+      "url": "https://example.com/bali",
+      "img": "https://img.icons8.com/fluency/96/000000/beach.png",
+      "category": "Travel",
+      "tags": ["travel","guide"],
+      "hintEmoji": "🤩",
+      "type": "leaf",
+      "description": "Top tips and an itinerary for Bali."
+    },
+    {
+      "id": "l6",
+      "title": "Lifestyle Pick #1",
+      "url": "https://postimg.cc/3WYWQ5qX",
+      "img": "https://i.postimg.cc/3WYWQ5qX/8906e69e882131bcadda6ed996ac695c.jpg",
+      "category": "Lifestyle",
+      "tags": ["style","inspo"],
+      "hintEmoji": "✨",
+      "type": "leaf",
+      "description": "Curated lifestyle inspiration."
+    },
+    {
+      "id": "l7",
+      "title": "Lifestyle Pick #2",
+      "url": "https://postimg.cc/9rfMzPCz",
+      "img": "https://i.postimg.cc/9rfMzPCz/d7928186887071adbdd5bd26ead74653.jpg",
+      "category": "Lifestyle",
+      "tags": ["fashion","daily"],
+      "hintEmoji": "🌟",
+      "type": "leaf",
+      "description": "Trending fashion-forward pick."
+    },
+    {
+      "id": "l8",
+      "title": "Lifestyle Pick #3",
+      "url": "https://postimg.cc/xq580prW",
+      "img": "https://i.postimg.cc/xq580prW/f543d86d2caf4f9925aa2611d8171374.jpg",
+      "category": "Lifestyle",
+      "tags": ["vibe","look"],
+      "hintEmoji": "👌",
+      "type": "leaf",
+      "description": "Aesthetic vibes for inspiration."
+    },
+    {
+      "id": "l9",
+      "title": "Dheeja Store",
+      "url": "https://dheeja-store.vercel.app",
+      "img": "https://img.icons8.com/fluency/96/000000/shop.png",
+      "category": "E-commerce",
+      "tags": ["store","fashion","shopping"],
+      "hintEmoji": "🛍️",
+      "type": "fruit",
+      "description": "Modern online shopping experience."
+    },
+    {
+      "id": "l10",
+      "title": "IB Abaya",
+      "url": "https://ib-abaya.vercel.app/",
+      "img": "https://img.icons8.com/fluency/96/000000/dress.png",
+      "category": "Clothing",
+      "tags": ["abaya","modest","fashion"],
+      "hintEmoji": "🧕",
+      "type": "leaf",
+      "description": "Elegant abayas and modest wear."
+    },
+    {
+      "id": "l11",
+      "title": "Readify",
+      "url": "https://readify-rust.vercel.app",
+      "img": "https://img.icons8.com/fluency/96/000000/book.png",
+      "category": "Education",
+      "tags": ["reading","books"],
+      "hintEmoji": "📚",
+      "type": "leaf",
+      "description": "Read smarter with curated book selections."
+    },
+    {
+      "id": "l12",
+      "title": "Cyberman Jet",
+      "url": "https://cyberman-jet.vercel.app",
+      "img": "https://img.icons8.com/fluency/96/000000/robot.png",
+      "category": "Technology",
+      "tags": ["ai","cyber","future"],
+      "hintEmoji": "🤖",
+      "type": "fruit",
+      "description": "Tech-focused platform with futuristic vibes."
+    },
+    {
+      "id": "l13",
+      "title": "Alhaji Mohammed",
+      "url": "https://alhaji-mohammed.vercel.app/index.html",
+      "img": "https://img.icons8.com/fluency/96/000000/user.png",
+      "category": "Personal",
+      "tags": ["profile","portfolio"],
+      "hintEmoji": "👤",
+      "type": "leaf",
+      "description": "Personal portfolio and profile site."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "projects": [
+    {
+      "title": "Dheeja Store",
+      "url": "https://dheeja-store.vercel.app",
+      "image": "https://i.postimg.cc/3WYWQ5qX/8906e69e882131bcadda6ed996ac695c.jpg"
+    },
+    {
+      "title": "IB Abaya",
+      "url": "https://ib-abaya.vercel.app/",
+      "image": "https://i.postimg.cc/9rfMzPCz/d7928186887071adbdd5bd26ead74653.jpg"
+    },
+    {
+      "title": "Readify Rust",
+      "url": "https://readify-rust.vercel.app",
+      "image": "https://i.postimg.cc/xq580prW/f543d86d2caf4f9925aa2611d8171374.jpg"
+    },
+    {
+      "title": "Cyberman Jet",
+      "url": "https://cyberman-jet.vercel.app",
+      "image": "https://i.postimg.cc/3WYWQ5qX/8906e69e882131bcadda6ed996ac695c.jpg"
+    },
+    {
+      "title": "Alhaji Mohammed",
+      "url": "https://alhaji-mohammed.vercel.app/index.html",
+      "image": "https://i.postimg.cc/9rfMzPCz/d7928186887071adbdd5bd26ead74653.jpg"
+    }
+  ]
+}

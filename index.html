@@ -1,144 +1,460 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orbit Showcase 🌍</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Interactive Palm — WebGL (Three.js)</title>
   <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background: radial-gradient(circle at center, #000010, #000000);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      color: white;
-    }
-
-    .sun {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: gold;
-      box-shadow: 0 0 40px 15px rgba(255, 215, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      position: absolute;
-      z-index: 10;
-    }
-
-    .orbit {
-      position: absolute;
-      border: 1px dashed rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      animation: spin linear infinite;
-    }
-
-    .planet {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background-size: cover;
-      background-position: center;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(255,255,255,0.6);
-    }
-
-    .moon {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background-size: cover;
-      background-position: center;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(255,255,255,0.6);
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    #canvas-wrap{position:fixed;inset:0;background:linear-gradient(180deg,#b9e6ff 0%, #f0f9ff 35%, #e9f7ee 100%)}
+    #ui{position:absolute;left:12px;top:12px;z-index:10;backdrop-filter:blur(6px);padding:10px;border-radius:8px}
+    #ui h3{margin:0 0 6px 0;font-size:14px}
+    #ui p{margin:0;font-size:12px;opacity:.9}
+    .btn{display:inline-block;margin-top:8px;padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
+    #legend{position:absolute;right:12px;top:12px;background:rgba(255,255,255,0.85);padding:8px;border-radius:8px;font-size:12px}
+    #credits{position:absolute;left:12px;bottom:12px;font-size:12px;color:#033}
+    canvas{display:block}
   </style>
 </head>
 <body>
-  <div class="sun" id="sun">Main 🌐</div>
-  <script>
-    // Load JSON data
-    fetch("data.json")
-      .then(res => res.json())
-      .then(data => {
-        createPlanets(data.branches);
+  <div id="canvas-wrap"></div>
+  <div id="ui">
+    <h3>Interactive Palm — WebGL</h3>
+    <p>Curved branches, leaves (internal links) and fruits (external promos). Hover to preview, click to follow. Popularity reorders items.</p>
+    <button id="toggle-sway" class="btn">Toggle gentle sway</button>
+    <button id="reseed" class="btn">Randomize layout</button>
+  </div>
+  <div id="legend">Tip: Drag to orbit • Scroll to zoom</div>
+  <div id="credits">Built with Three.js • Single-file demo</div>  <script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.154.0/build/three.module.js';
+  import { OrbitControls } from 'https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js';
+
+  // ---------- Sample JSON data structure (editable) ----------
+  const TREE_DATA = {
+    trunkEmoji: '🌴',
+    branches: [
+      {
+        name: 'Electronics',
+        angleDeg: -38,
+        leaves: [
+          { id: 'phones', label: 'Phones', url: '/electronics/phones', internal: true, clicks: 0 },
+          { id: 'laptops', label: 'Laptops', url: '/electronics/laptops', internal: true, clicks: 0 },
+          { id: 'audio', label: 'Audio', url: '/electronics/audio', internal: true, clicks: 0 }
+        ],
+        fruits: [
+          { id: 'elec-sale', label: 'Holiday Sale', url: 'https://example.com/sale', internal: false, clicks: 0 }
+        ]
+      },
+      {
+        name: 'Clothing',
+        angleDeg: 38,
+        leaves: [
+          { id: 'mens', label: "Men's", url: '/clothing/mens', internal: true, clicks: 0 },
+          { id: 'womens', label: "Women's", url: '/clothing/womens', internal: true, clicks: 0 }
+        ],
+        fruits: [
+          { id: 'cloth-deal', label: '30% Off', url: 'https://example.com/cloth', internal: false, clicks: 0 },
+        ]
+      }
+    ]
+  };
+
+  // ---------- Scene setup ----------
+  const container = document.getElementById('canvas-wrap');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 2000);
+  camera.position.set(0, 6, 12);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 3, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.07;
+
+  // lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+  dir.position.set(5, 10, 3);
+  scene.add(dir);
+
+  // ground (subtle)
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(60, 60),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.01;
+  scene.add(ground);
+
+  // utility arrays
+  const pickable = [];
+
+  // ---------- Trunk (emoji sprite + cylinder) ----------
+  const trunkHeight = 3.6;
+  const trunkGeo = new THREE.CylinderGeometry(0.45, 0.6, trunkHeight, 12);
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x9b6b3a, roughness: 0.9 });
+  const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+  trunk.position.y = trunkHeight / 2;
+  scene.add(trunk);
+
+  // emoji sprite at top of trunk
+  const emojiSprite = makeEmojiSprite(TREE_DATA.trunkEmoji, 120);
+  emojiSprite.position.set(0, trunk.position.y + trunkHeight / 2 + 0.08, 0);
+  scene.add(emojiSprite);
+
+  // ---------- Branch generator ----------
+  // We'll create curved branches using CatmullRomCurve3 and TubeGeometry.
+  const branchGroup = new THREE.Group();
+  scene.add(branchGroup);
+
+  // store branch metadata for later animations & positioning
+  const BRANCHES = [];
+
+  // seed random but stable
+  function rand(seed = 1) { let x = Math.sin(seed) * 10000; return x - Math.floor(x); }
+
+  function buildTree() {
+    // clear previous
+    BRANCHES.forEach(b => { if (b.mesh) branchGroup.remove(b.mesh); b.leafObjects?.forEach(o=>scene.remove(o)); b.fruitObjects?.forEach(o=>scene.remove(o)); });
+    BRANCHES.length = 0;
+
+    const top = new THREE.Vector3(0, trunk.position.y + trunkHeight / 2, 0);
+    const baseRadius = 1.8;
+
+    TREE_DATA.branches.forEach((bData, bi) => {
+      const angle = THREE.MathUtils.degToRad(bData.angleDeg || (bi * 40 - 20));
+      const length = 4.4 + (bi % 2) * 0.4;
+      const curvePoints = [];
+
+      // create control points to form a nice curved palm branch
+      curvePoints.push(top.clone());
+      const mid1 = new THREE.Vector3(Math.cos(angle) * (baseRadius + 0.9), top.y + 0.6, Math.sin(angle) * (baseRadius + 0.9));
+      const mid2 = new THREE.Vector3(Math.cos(angle) * (baseRadius + length * 0.4), top.y + 0.9, Math.sin(angle) * (baseRadius + length * 0.4));
+      const tip  = new THREE.Vector3(Math.cos(angle) * (baseRadius + length), top.y + 0.4, Math.sin(angle) * (baseRadius + length));
+
+      curvePoints.push(mid1, mid2, tip);
+      const curve = new THREE.CatmullRomCurve3(curvePoints);
+
+      // tube geometry for branch
+      const tubularSegments = Math.max(20, Math.floor(8 + length * 8));
+      const radiusFunc = (u)=>0.12 * (1 - u * 0.85) + 0.02;
+      const tubeGeom = new THREE.TubeGeometry(curve, tubularSegments, 0.12, 6, false);
+      const mat = new THREE.MeshStandardMaterial({ color: 0x6b3f2a, metalness: 0.05, roughness: 0.95 });
+      const mesh = new THREE.Mesh(tubeGeom, mat);
+      branchGroup.add(mesh);
+
+      // add a label near branch base
+      const labelSprite = makeTextSprite(bData.name, {fontsize:18, padding:6, bgColor:'rgba(255,255,255,0.9)'});
+      const labelPos = curve.getPoint(0.18);
+      labelSprite.position.copy(labelPos).add(new THREE.Vector3(0,0.12,0));
+      labelSprite.scale.setScalar(0.9);
+      scene.add(labelSprite);
+
+      // create leaves and fruits along t values
+      const leafCount = bData.leaves.length;
+      const fruitCount = bData.fruits.length;
+
+      const leafObjects = [];
+      const fruitObjects = [];
+
+      // leaves: use Sprites (lightweight) with canvas textures so we can show labels and simple icons
+      bData.leaves.forEach((leaf, i) => {
+        const t = 0.35 + (i / Math.max(1, leafCount)) * 0.45; // along the branch
+        const pos = curve.getPoint(t);
+        const tangent = curve.getTangent(t).normalize();
+        const normal = new THREE.Vector3().crossVectors(tangent, new THREE.Vector3(0,1,0)).normalize();
+        const offset = normal.clone().multiplyScalar(0.6 + 0.08 * (i % 2));
+        const finalPos = pos.clone().add(offset).add(new THREE.Vector3(0, -0.02 * i, 0));
+
+        const sprite = makeLeafSprite(leaf.label);
+        sprite.position.copy(finalPos);
+        sprite.userData = { type: 'leaf', data: leaf, branchIndex: bi, t, basePos: finalPos.clone(), hover: false };
+        sprite.scale.set(0.8, 0.8, 0.8);
+        scene.add(sprite);
+        pickable.push(sprite);
+        leafObjects.push(sprite);
       });
 
-    function createPlanets(branches) {
-      const center = document.getElementById("sun");
+      // fruits: spheres that "hang" (slightly below curve)
+      bData.fruits.forEach((fruit, i) => {
+        const t = 0.45 + (i / Math.max(1, fruitCount)) * 0.38;
+        const pos = curve.getPoint(t);
+        const hang = new THREE.Vector3(0, -0.35 - 0.08*i, 0);
+        const finalPos = pos.clone().add(hang);
+        const geom = new THREE.SphereGeometry(0.18, 16, 12);
+        const matF = new THREE.MeshStandardMaterial({ color: 0xff5a5a, emissive:0x000000, roughness:0.6 });
+        const meshF = new THREE.Mesh(geom, matF);
+        meshF.position.copy(finalPos);
+        meshF.userData = { type: 'fruit', data: fruit, branchIndex: bi, t, basePos: finalPos.clone(), hover:false };
+        scene.add(meshF);
+        pickable.push(meshF);
+        fruitObjects.push(meshF);
 
-      branches.forEach((branch, i) => {
-        const orbit = document.createElement("div");
-        orbit.className = "orbit";
-        const size = 200 + i * 120; // orbit radius
-        orbit.style.width = orbit.style.height = size + "px";
-        orbit.style.marginLeft = orbit.style.marginTop = -(size / 2) + "px";
-        orbit.style.animationDuration = (20 + i * 5) + "s";
+        // tiny stem as cylinder
+        const stemGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.18, 6);
+        const stem = new THREE.Mesh(stemGeo, new THREE.MeshStandardMaterial({ color:0x6b3f2a }));
+        stem.position.copy(pos.clone().add(hang.clone().multiplyScalar(0.45)));
+        stem.lookAt(finalPos);
+        stem.rotateX(Math.PI/2);
+        scene.add(stem);
+      });
 
-        const planet = document.createElement("div");
-        planet.className = "planet";
-        planet.style.backgroundImage = `url(${branch.image})`;
-        planet.title = branch.name;
+      BRANCHES.push({ curve, mesh, labelSprite, leafObjects, fruitObjects, bData, angle });
+    });
+  }
 
-        // Position planet at edge of orbit
-        planet.style.transform = `translate(-50%, -50%) translateX(${size/2}px)`;
+  // ---------- Helper texture/sprite creators ----------
+  function makeEmojiSprite(emoji='🌴', size = 120){
+    const c = document.createElement('canvas'); c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    ctx.font = Math.floor(size*0.8)+'px serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, size/2, size/2+6);
+    const tex = new THREE.CanvasTexture(c);
+    const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
+    const spr = new THREE.Sprite(mat);
+    spr.scale.set(1.4,1.4,1);
+    return spr;
+  }
 
-        // Click planet to show moons (leaves)
-        planet.addEventListener("click", () => {
-          if (planet.querySelectorAll(".moon").length === 0) {
-            branch.leaves.forEach((leaf, j) => {
-              const moonOrbit = document.createElement("div");
-              moonOrbit.className = "orbit";
-              const moonSize = 80 + j * 50;
-              moonOrbit.style.width = moonOrbit.style.height = moonSize + "px";
-              moonOrbit.style.marginLeft = moonOrbit.style.marginTop = -(moonSize / 2) + "px";
-              moonOrbit.style.animationDuration = (10 + j * 3) + "s";
+  function makeTextSprite(text, opts={fontsize:20,padding:8,bgColor:'rgba(255,255,255,0.95)'}){
+    const font = `${opts.fontsize||20}px sans-serif`;
+    const padding = opts.padding||8;
+    const c = document.createElement('canvas');
+    const ctx = c.getContext('2d');
+    ctx.font = font;
+    const metrics = ctx.measureText(text);
+    const w = Math.ceil(metrics.width) + padding*2;
+    const h = Math.ceil((opts.fontsize||20) * 1.4) + padding*2;
+    c.width = w; c.height = h;
+    ctx.fillStyle = opts.bgColor || 'rgba(255,255,255,0.95)';
+    roundRect(ctx, 0, 0, w, h, 6); ctx.fill();
+    ctx.fillStyle = '#000'; ctx.font = font; ctx.textBaseline='middle'; ctx.textAlign='center';
+    ctx.fillText(text, w/2, h/2);
+    const tex = new THREE.CanvasTexture(c);
+    const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
+    const spr = new THREE.Sprite(mat);
+    spr.scale.set(w/80, h/80, 1);
+    return spr;
+  }
 
-              const moon = document.createElement("div");
-              moon.className = "moon";
-              moon.style.backgroundImage = `url(${leaf.image})`;
-              moon.title = leaf.name;
+  function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 
-              // Clicking a moon opens its link
-              moon.addEventListener("click", (e) => {
-                e.stopPropagation();
-                if (leaf.url) window.open(leaf.url, "_blank");
-              });
+  function makeLeafSprite(label){
+    const w = 220, h = 120;
+    const c = document.createElement('canvas'); c.width=w; c.height=h;
+    const ctx = c.getContext('2d');
+    // leaf shape background
+    ctx.fillStyle = 'rgba(64,160,64,0.95)';
+    ctx.beginPath(); ctx.ellipse(w*0.5,h*0.5,w*0.46,h*0.42,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '20px sans-serif'; ctx.textBaseline='middle'; ctx.textAlign='center';
+    ctx.fillText(label, w/2, h/2);
+    const tex = new THREE.CanvasTexture(c);
+    const mat = new THREE.SpriteMaterial({ map: tex });
+    const spr = new THREE.Sprite(mat);
+    spr.scale.set(1.4, 0.8, 1);
+    return spr;
+  }
 
-              moon.style.transform = `translate(-50%, -50%) translateX(${moonSize/2}px)`;
-              moonOrbit.appendChild(moon);
-              planet.appendChild(moonOrbit);
-            });
-          } else {
-            // Toggle moons off
-            planet.innerHTML = "";
-          }
-        });
+  // ---------- Interaction: raycasting for hover & clicks ----------
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2(-1,-1);
 
-        orbit.appendChild(planet);
-        document.body.appendChild(orbit);
+  function onPointerMove(e){
+    pointer.x = (e.clientX / innerWidth) * 2 - 1;
+    pointer.y = -(e.clientY / innerHeight) * 2 + 1;
+  }
+  window.addEventListener('pointermove', onPointerMove);
+
+  function onPointerDown(e){
+    // raycast
+    raycaster.setFromCamera(pointer, camera);
+    const hits = raycaster.intersectObjects(pickable, true);
+    if(hits.length){
+      const o = hits[0].object;
+      handleClickObject(o);
+    }
+  }
+  window.addEventListener('pointerdown', onPointerDown);
+
+  function handleClickObject(obj){
+    const ud = obj.userData || {};
+    if(!ud.type) return;
+    const item = ud.data;
+    // visual click animation
+    const baseScale = obj.scale ? obj.scale.clone() : new THREE.Vector3(1,1,1);
+    // pulse
+    new TWEEN.Tween({s:1})
+      .to({s:1.25}, 160).easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(({s})=>{ if(obj.scale) obj.scale.set(baseScale.x*s, baseScale.y*s, baseScale.z*s); })
+      .yoyo(true).repeat(1).start();
+
+    // increment clicks for popularity and reorder
+    item.clicks = (item.clicks||0) + 1;
+    reorderByPopularity(ud.branchIndex);
+
+    if(ud.type === 'leaf'){
+      if(item.internal){
+        // internal navigation
+        location.href = item.url;
+      } else {
+        window.open(item.url, '_blank');
+      }
+    } else if(ud.type === 'fruit'){
+      window.open(item.url, '_blank');
+    }
+  }
+
+  // ---------- Popularity reorder ----------
+  function reorderByPopularity(branchIndex){
+    const br = BRANCHES[branchIndex];
+    if(!br) return;
+    const bData = br.bData;
+
+    // sort leaves and fruits by clicks ascending so popular ones move to the end
+    bData.leaves.sort((a,b)=> (a.clicks||0) - (b.clicks||0) );
+    bData.fruits.sort((a,b)=> (a.clicks||0) - (b.clicks||0) );
+
+    // reposition
+    br.leafObjects.forEach(o=>scene.remove(o));
+    br.leafObjects.length = 0;
+    br.fruitObjects.forEach(o=>scene.remove(o));
+    br.fruitObjects.length = 0;
+
+    // recreate items for this branch only (keeps other branches intact)
+    const curve = br.curve;
+    // leaves
+    bData.leaves.forEach((leaf,i)=>{
+      const t = 0.35 + (i / Math.max(1, bData.leaves.length)) * 0.45;
+      const pos = curve.getPoint(t);
+      const tangent = curve.getTangent(t).normalize();
+      const normal = new THREE.Vector3().crossVectors(tangent, new THREE.Vector3(0,1,0)).normalize();
+      const offset = normal.clone().multiplyScalar(0.6 + 0.08 * (i % 2));
+      const finalPos = pos.clone().add(offset).add(new THREE.Vector3(0, -0.02 * i, 0));
+      const sprite = makeLeafSprite(leaf.label);
+      sprite.position.copy(finalPos);
+      sprite.userData = { type:'leaf', data: leaf, branchIndex, t, basePos: finalPos.clone() };
+      sprite.scale.set(0.8,0.8,0.8);
+      scene.add(sprite);
+      pickable.push(sprite);
+      br.leafObjects.push(sprite);
+    });
+    // fruits
+    bData.fruits.forEach((fruit,i)=>{
+      const t = 0.45 + (i / Math.max(1, bData.fruits.length)) * 0.38;
+      const pos = curve.getPoint(t);
+      const hang = new THREE.Vector3(0, -0.35 - 0.08*i, 0);
+      const finalPos = pos.clone().add(hang);
+      const geom = new THREE.SphereGeometry(0.18, 16, 12);
+      const matF = new THREE.MeshStandardMaterial({ color: 0xff5a5a, roughness:0.6 });
+      const meshF = new THREE.Mesh(geom, matF);
+      meshF.position.copy(finalPos);
+      meshF.userData = { type: 'fruit', data: fruit, branchIndex, t, basePos: finalPos.clone() };
+      scene.add(meshF);
+      pickable.push(meshF);
+      br.fruitObjects.push(meshF);
+    });
+  }
+
+  // ---------- Simple animation loop: sway & hover effects ----------
+  let clock = new THREE.Clock();
+  let swayEnabled = true;
+
+  function animate(){
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // gentle sway: perturb branch control points slightly and update tube geometries
+    if(swayEnabled){
+      BRANCHES.forEach((br, bi)=>{
+        const curve = br.curve;
+        // adjust control points for a subtle organic motion
+        // Original curve points are stored implicitly; we'll nudge mesh rotation instead for perf
+        const sway = Math.sin(t * 0.7 + bi * 0.6) * 0.06;
+        br.mesh.rotation.z = sway * (br.angle>0?1:-1);
       });
     }
-  </script>
-</body>
-</html>
+
+    // hover detection
+    raycaster.setFromCamera(pointer, camera);
+    const intersects = raycaster.intersectObjects(pickable, true);
+
+    // reset hover for all
+    pickable.forEach(obj=>{ if(obj.userData) obj.userData.hover = false; if(obj.material && obj.material.emissive) obj.material.emissive.setHex(0x000000); if(obj.scale){ obj.scale.lerp(new THREE.Vector3(1,1,1), 0.08); }});
+
+    if(intersects.length){
+      const o = intersects[0].object;
+      o.userData.hover = true;
+      // scale up
+      if(o.scale) o.scale.lerp(new THREE.Vector3(1.18,1.18,1.18), 0.16);
+      // add subtle emissive for fruits
+      if(o.material && o.material.emissive) o.material.emissive.setHex(0x222222);
+    }
+
+    // small per-item swaying motion for leaves and fruits
+    BRANCHES.forEach((br, bi)=>{
+      (br.leafObjects||[]).forEach((spr, i)=>{
+        const u = (t + i*0.6 + bi*0.4);
+        const sway = Math.sin(u) * 0.03;
+        const base = spr.userData.basePos;
+        spr.position.x = base.x + sway;
+        spr.position.y = base.y + Math.sin(u*1.3)*0.01;
+      });
+      (br.fruitObjects||[]).forEach((f, i)=>{
+        const u = (t + i*0.4 + bi*0.9);
+        const sway = Math.sin(u) * 0.02;
+        const base = f.userData.basePos;
+        f.position.x = base.x + sway;
+        f.position.y = base.y + Math.sin(u*1.4)*0.01;
+      });
+    });
+
+    TWEEN.update();
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  // ---------- Minimal tween implementation via included tween.js fallback ----------
+  // We'll add a tiny inline TWEEN for the pulse effect (keeps dependencies low)
+  // If Tween library not present, we ship a very small one.
+  window.TWEEN = window.TWEEN || (function(){
+    const tweens = [];
+    function Tween(obj){ this.obj = obj; this._to = {}; this._dur=300; this._onUpdate=null; this._onComplete=null; this._easing=(t)=>t; }
+    Tween.prototype.to = function(to, dur){ this._to=to; if(dur) this._dur=dur; return this; };
+    Tween.prototype.easing = function(fn){ this._easing=fn; return this; };
+    Tween.prototype.onUpdate = function(fn){ this._onUpdate=fn; return this; };
+    Tween.prototype.onComplete = function(fn){ this._onComplete=fn; return this; };
+    Tween.prototype.start = function(){ this._start=Date.now(); this._from={}; for(const k in this._to) this._from[k]=this.obj[k]; tweens.push(this); return this; };
+    Tween.prototype.yoyo = function(){ this._yoyo=true; return this; };
+    Tween.prototype.repeat = function(c){ this._repeat=c; return this; };
+    function update(){ const now=Date.now(); for(let i=tweens.length-1;i>=0;i--){ const tw=tweens[i]; const p=Math.min(1,(now-tw._start)/tw._dur); const e=tw._easing(p); for(const k in tw._to) tw.obj[k]=tw._from[k] + (tw._to[k]-tw._from[k]) * e; if(tw._onUpdate) tw._onUpdate(tw.obj); if(p>=1){ if(tw._yoyo){ const tmp=tw._from; tw._from=tw._to; tw._to=tmp; tw._start=Date.now(); tw._yoyo=false; tw._repeat = (tw._repeat||0)-1; if(tw._repeat>0) continue; } if(tw._onComplete) tw._onComplete(); tweens.splice(i,1); } }
+    }
+    return { Tween:Tween, update:function(){ update(); }, Easing:{ Quadratic:{ Out:function(t){ return 1 - (1 - t) * (1 - t); } } } , add:function(t){/*noop*/} };
+  })();
+  const TWEEN = window.TWEEN;
+
+  // ---------- Event handlers for UI ----------
+  document.getElementById('toggle-sway').addEventListener('click', ()=>{ swayEnabled = !swayEnabled; document.getElementById('toggle-sway').textContent = swayEnabled? 'Disable sway':'Enable sway'; });
+  document.getElementById('reseed').addEventListener('click', ()=>{ // simple shuffle of items
+    TREE_DATA.branches.forEach(b=>{ b.leaves.sort(()=>Math.random()-0.5); b.fruits.sort(()=>Math.random()-0.5); });
+    buildTree();
+  });
+
+  // ---------- handle resize ----------
+  window.addEventListener('resize', ()=>{ camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+  // ---------- wire up initial build & animate ----------
+  buildTree();
+  animate();
+
+  // ---------- small utility: cleanup on unload ----------
+  window.addEventListener('beforeunload', ()=>{ renderer.dispose(); });
+
+  // ---------- END MODULE ----------
+  </script></body>
+  </html>

@@ -3,543 +3,171 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bento Showcase — Links & Promos</title>
-  <meta name="description" content="Professional link showcase (bento/grid) with images, emoji hints, search, filters, tags, bookmarks, popularity and progressive enhancement." />
-  <meta name="theme-color" content="#0b6b58" />
+  <title>Bento Showcase</title>
   <style>
-    /* ---------- Minimal reset & theme vars ---------- */
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; -webkit-font-smoothing:antialiased;}
-    :root{
-      --bg: #f4f9f8;
-      --card: #ffffff;
-      --muted: #5f6b6a;
-      --accent: #0b6b58;
-      --accent-2: #0f9d70;
-      --leaf: #dff5e6;
-      --fruit: #fff4e1;
-      --radius: 12px;
-      --gap: 14px;
-      --max-width: 1200px;
-      --shadow: 0 10px 30px rgba(16,24,24,0.06);
+    body {
+      margin:0;
+      font-family: system-ui, sans-serif;
+      background: linear-gradient(135deg, #f0fdfa, #e0f7fa);
+      color:#0f172a;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
     }
 
-    body { background: linear-gradient(135deg,#f0fbfa 0%, #e6f7f2 100%); padding: clamp(10px,2.2vw,28px); display:flex; justify-content:center; }
-    .wrap { width:100%; max-width:var(--max-width); display:flex; flex-direction:column; gap:var(--gap); }
+    header {
+      max-width:900px;
+      width:100%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
 
-    /* header */
-    header { display:flex; gap:12px; align-items:center; justify-content:space-between; background: rgba(255,255,255,0.75); border-radius:var(--radius); padding:12px 14px; box-shadow:var(--shadow); backdrop-filter: blur(4px); }
-    .brand { display:flex; gap:12px; align-items:center; }
-    .logo { width:48px; height:48px; border-radius:10px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; box-shadow:0 8px 20px rgba(11,107,88,0.18); }
-    h1 { font-size:18px; margin:0; }
-    .sub { font-size:12px; color:var(--muted); margin-top:2px; }
-    .controls { display:flex; gap:10px; align-items:center; }
+    h1 { margin:0; font-size:1.5rem; }
+    input[type="search"] {
+      padding:10px 14px;
+      border:1px solid #ccc;
+      border-radius:8px;
+      width:220px;
+      font-size:14px;
+    }
 
-    /* search + filters */
-    .toolbar { display:flex; gap:12px; align-items:center; }
-    .search { display:flex; gap:8px; align-items:center; padding:8px 10px; border-radius:10px; background:#fff; border:1px solid rgba(0,0,0,0.04); box-shadow:0 6px 18px rgba(12,17,23,0.04); }
-    .search input { border:0; outline:none; font-size:14px; min-width:220px; }
-    .chip { padding:8px 10px; border-radius:999px; background:transparent; border:1px solid rgba(0,0,0,0.06); font-weight:600; cursor:pointer; }
-    .chip.active { background:var(--accent); color:#fff; border-color:transparent; }
+    .grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap:16px;
+      width:100%;
+      max-width:900px;
+    }
 
-    /* layout */
-    main { display:grid; grid-template-columns: 1fr 320px; gap:var(--gap); align-items:start; }
-    @media (max-width:980px){ main{grid-template-columns:1fr;} .sidebar{order:2} }
-
-    /* bento grid */
-    .grid { background:transparent; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; }
     .card {
-      background:var(--card); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow); transition:transform .16s ease, box-shadow .16s ease;
-      min-height:150px; border:1px solid rgba(0,0,0,0.03);
+      position:relative;
+      border-radius:16px;
+      overflow:hidden;
+      min-height:180px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      padding:16px;
+      background:#fff;
+      box-shadow:0 4px 20px rgba(0,0,0,0.1);
+      transition:transform .2s, box-shadow .2s;
+      cursor:pointer;
     }
-    .card:focus-within, .card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(12,17,23,0.08); }
+    .card:hover {
+      transform:translateY(-6px);
+      box-shadow:0 8px 30px rgba(0,0,0,0.15);
+    }
+    .card::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      background-size:cover;
+      background-position:center;
+      opacity:0.5;
+    }
+    .card-content {
+      position:relative;
+      z-index:1;
+      background:rgba(255,255,255,0.7);
+      padding:12px;
+      border-radius:12px;
+    }
 
-    .media-row { display:flex; gap:10px; align-items:center; }
-    .thumb { width:68px; height:68px; border-radius:10px; flex-shrink:0; display:block; overflow:hidden; background:#f6fbf9; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px; }
-    .meta { display:flex; flex-direction:column; gap:4px; }
-    .title { margin:0; font-size:15px; font-weight:800; color:#0b2b2a; }
-    .desc { margin:0; color:var(--muted); font-size:13px; min-height:36px; }
-
-    .badge-row { display:flex; gap:8px; align-items:center; margin-top:auto; }
-    .btn { background:var(--accent); color:#fff; border:0; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; }
-    .btn.secondary { background:transparent; color:var(--accent); border:1px solid rgba(0,0,0,0.06); }
-
-    .badge { font-size:12px; padding:6px 8px; border-radius:999px; font-weight:700; }
-    .badge.hint { background:rgba(255,255,255,0.95); border:1px solid rgba(0,0,0,0.04); box-shadow:0 6px 18px rgba(12,17,23,0.03); }
-    .badge.leaf { background:var(--leaf); color:#0b6b58; }
-    .badge.fruit { background:var(--fruit); color:#b45309; }
-
-    /* tags */
-    .tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
-    .tag { font-size:12px; padding:6px 8px; border-radius:999px; background:rgba(0,0,0,0.04); cursor:pointer; }
-
-    /* sidebar */
-    .sidebar { display:flex; flex-direction:column; gap:12px; position:sticky; top:20px; align-self:start; }
-    .panel { background:var(--card); padding:12px; border-radius:10px; box-shadow:var(--shadow); border:1px solid rgba(0,0,0,0.03); }
-
-    /* small helpers */
-    .muted { color:var(--muted); font-size:13px; }
-    .result-count { font-weight:700; color:var(--accent); }
-    .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
-
-    /* responsiveness & motion preference */
-    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
-    @media (max-width:700px){
-      .search input{ min-width: 120px; }
-      .thumb{ width:58px; height:58px; }
+    .emoji {
+      font-size:1.5rem;
+      margin-right:8px;
+    }
+    .title {
+      font-size:1rem;
+      font-weight:700;
+      margin:0 0 4px 0;
+    }
+    .desc {
+      font-size:0.875rem;
+      margin:0;
+      color:#334155;
+    }
+    .btn {
+      margin-top:10px;
+      padding:8px 12px;
+      border:none;
+      border-radius:8px;
+      background:#00796b;
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
     }
   </style>
 </head>
 <body>
-  <div class="wrap" id="app">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true">BN</div>
-        <div>
-          <h1>Bento Showcase</h1>
-          <div class="sub">Showcase links with images, emoji hints, search & industry features</div>
-        </div>
-      </div>
+  <header>
+    <h1>✨ Bento Showcase</h1>
+    <input type="search" id="search" placeholder="Search...">
+  </header>
 
-      <div class="controls" role="toolbar" aria-label="global controls">
-        <div class="toolbar">
-          <div class="search" role="search" aria-label="Search links">
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#6c7a77" d="M21 21l-4.35-4.35"></path></svg>
-            <input id="searchInput" placeholder="Search title, tag, description..." aria-label="Search links" />
-          </div>
-          <button id="clearFilters" class="chip">Clear</button>
-        </div>
-        <button id="signin" class="chip">Sign in</button>
-      </div>
-    </header>
+  <main class="grid" id="grid"></main>
 
-    <main>
-      <section class="catalog">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px;">
-          <div class="muted">Showing <span id="resultCount" class="result-count">0</span> results</div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <label for="sortSelect" class="muted">Sort</label>
-            <select id="sortSelect" style="padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06);">
-              <option value="popular">Most popular</option>
-              <option value="new">Newest</option>
-              <option value="alpha">A → Z</option>
-            </select>
-          </div>
-        </div>
+  <script>
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("search");
 
-        <div id="grid" class="grid" aria-live="polite"></div>
-      </section>
+    // --- Fallback sample data ---
+    const SAMPLE = [
+      { title:"OpenAI", desc:"🤔 Should I click? Let's see!", url:"https://openai.com", img:"https://source.unsplash.com/600x400/?ai" },
+      { title:"MDN Docs", desc:"😏 Need web docs?", url:"https://developer.mozilla.org", img:"https://source.unsplash.com/600x400/?code" },
+      { title:"Promo Sale", desc:"🎁 Surprise deal inside", url:"https://example.com", img:"https://source.unsplash.com/600x400/?sale" }
+    ];
 
-      <aside class="sidebar" aria-label="Filters and tools">
-        <div class="panel">
-          <strong>Filters</strong>
-          <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
-            <div>
-              <label class="muted" for="categorySelect">Category</label>
-              <select id="categorySelect" style="width:100%; padding:8px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); margin-top:6px;">
-                <option value="">All categories</option>
-              </select>
-            </div>
+    let links = [];
 
-            <div>
-              <div class="muted" style="margin-bottom:6px;">Tags</div>
-              <div id="tagsWrap" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
-            </div>
-
-            <div>
-              <label class="muted">Type</label>
-              <div style="display:flex; gap:8px; margin-top:6px;">
-                <button id="filterAll" class="chip active">All</button>
-                <button id="filterLeaf" class="chip">Leaves</button>
-                <button id="filterFruit" class="chip">Fruits</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <strong>Bookmarks</strong>
-          <div style="margin-top:8px;">
-            <button id="exportBookmarks" class="btn secondary" style="width:100%;">Export (JSON)</button>
-            <button id="clearBookmarks" class="btn secondary" style="width:100%; margin-top:8px;">Clear</button>
-          </div>
-        </div>
-
-        <div class="panel">
-          <strong>Debug / Advanced</strong>
-          <div style="margin-top:8px;">
-            <button id="realtimeBtn" class="btn secondary" style="width:100%;">Enable Realtime (placeholder)</button>
-            <div class="muted" style="margin-top:8px; font-size:13px;">Data source: <code>/links.json</code> (fallback to inline sample)</div>
-          </div>
-        </div>
-      </aside>
-    </main>
-
-    <footer style="text-align:center; color:var(--muted); font-size:13px;">Built with modern patterns • Accessible • Progressive enhancement</footer>
-  </div>
-
-  <!-- Modal for preview -->
-  <div id="modal" role="dialog" aria-hidden="true" style="position:fixed; inset:0; display:none; background:rgba(0,0,0,0.45); align-items:center; justify-content:center; padding:20px;">
-    <div id="modalCard" style="background:#fff; border-radius:12px; padding:16px; width:min(720px,95%); box-shadow:0 24px 60px rgba(8,15,18,0.6);">
-      <button id="modalClose" style="float:right; border:none; background:transparent; font-size:18px; cursor:pointer;">✕</button>
-      <div id="modalContent"></div>
-    </div>
-  </div>
-
-  <script type="module">
-  // ---------- Bento Showcase — JS (modern, modular, commented) ----------
-  // GPT-5 Thinking mini — professional single-file implementation
-  const DATA_URL = './links.json'; // drop links.json in same folder to override fallback
-  const STORAGE_POP = 'bento_popularity_v1';
-  const STORAGE_BOOK = 'bento_bookmarks_v1';
-
-  // Inline fallback sample data (used if fetch fails or file missing)
-  const SAMPLE = {
-    updatedAt: (new Date()).toISOString(),
-    links: [
-      {
-        id: 'l1', title: 'Laptop Deal — 20% OFF', url: 'https://example.com/laptop',
-        img: 'https://img.icons8.com/fluency/96/000000/laptop.png',
-        category: 'Electronics', tags: ['tech','hardware'], hintEmoji: '🎁', type: 'fruit', description: 'Limited-time laptop promotion — click to view the deal.'
-      },
-      {
-        id: 'l2', title: 'Camera Review: Top 5', url: 'https://example.com/camera-review',
-        img: 'https://img.icons8.com/fluency/96/000000/camera.png',
-        category: 'Electronics', tags: ['review','photography'], hintEmoji: '🤔', type: 'leaf', description: 'In-depth camera reviews to help you decide.'
-      },
-      {
-        id: 'l3', title: 'Cool T-Shirt', url: 'https://example.com/tshirt',
-        img: 'https://img.icons8.com/fluency/96/000000/t-shirt.png',
-        category: 'Clothing', tags: ['fashion'], hintEmoji: '👍', type: 'leaf', description: 'Comfortable graphic tee.'
-      },
-      {
-        id: 'l4', title: 'Summer Sale - Jackets', url: 'https://example.com/jackets',
-        img: 'https://img.icons8.com/fluency/96/000000/jacket.png',
-        category: 'Clothing', tags: ['sale','seasonal'], hintEmoji: '🎁', type: 'fruit', description: 'Seasonal jackets sale — limited stock.'
-      },
-      {
-        id: 'l5', title: 'Travel Guide: Bali', url: 'https://example.com/bali',
-        img: 'https://img.icons8.com/fluency/96/000000/beach.png',
-        category: 'Travel', tags: ['travel','guide'], hintEmoji: '🤩', type: 'leaf', description: 'Top tips and an itinerary for Bali.'
-      },
-      {
-        id: 'l6', title: 'Productivity Tools', url: 'https://example.com/tools',
-        img: 'https://img.icons8.com/fluency/96/000000/productivity.png',
-        category: 'Utilities', tags: ['software','tools'], hintEmoji: '🤔', type: 'leaf', description: 'Collection of productivity web apps.'
-      },
-      {
-        id: 'l7', title: 'Weekly Deals', url: 'https://example.com/deals',
-        img: 'https://img.icons8.com/fluency/96/000000/discount.png',
-        category: 'Promotions', tags: ['deals','promo'], hintEmoji: '🎁', type: 'fruit', description: 'Curated weekly deals.'
-      },
-      {
-        id: 'l8', title: 'UX Portfolio', url: 'https://example.com/portfolio',
-        img: 'https://img.icons8.com/fluency/96/000000/portfolio.png',
-        category: 'Design', tags: ['portfolio','ux'], hintEmoji: '🤔', type: 'leaf', description: 'A showcase of UX projects.' }
-    ]
-  };
-
-  // ---- helpers ----
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => Array.from(document.querySelectorAll(sel));
-  const debounce = (fn, wait=220) => { let t; return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), wait); }; };
-
-  // Safe open external
-  function safeOpen(url){
-    try {
-      const u = new URL(url, location.href);
-      // prevent javascript: etc
-      if(u.protocol === 'http:' || u.protocol === 'https:') {
-        window.open(u.href, '_blank', 'noopener,noreferrer');
-      } else {
-        console.warn('Blocked non-http url:', url);
+    async function loadData(){
+      try {
+        const res = await fetch("links.json",{cache:"no-store"});
+        if(!res.ok) throw new Error("no links.json");
+        links = await res.json();
+      } catch(e){
+        console.warn("Using fallback sample data:", e.message);
+        links = SAMPLE;
       }
-    } catch(e){
-      console.warn('Invalid url', url);
-    }
-  }
-
-  // Local persistence
-  function readJSON(key, fallback={}) {
-    try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch(e){ return fallback; }
-  }
-  function writeJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
-
-  // Popularity & bookmarks
-  const popularity = readJSON(STORAGE_POP, {});
-  const bookmarks = readJSON(STORAGE_BOOK, {});
-
-  // UI elements
-  const grid = $('#grid');
-  const resultCount = $('#resultCount');
-  const searchInput = $('#searchInput');
-  const categorySelect = $('#categorySelect');
-  const tagsWrap = $('#tagsWrap');
-  const sortSelect = $('#sortSelect');
-
-  // Modal
-  const modal = $('#modal');
-  const modalContent = $('#modalContent');
-  const modalClose = $('#modalClose');
-
-  modalClose.addEventListener('click', () => { modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); modalContent.innerHTML = ''; });
-
-  // load data (try links.json else fallback)
-  async function loadData(){
-    try {
-      const res = await fetch(DATA_URL, {cache:'no-store'});
-      if(!res.ok) throw new Error('no links.json');
-      const json = await res.json();
-      if(!json.links || !Array.isArray(json.links)) throw new Error('invalid format');
-      return json.links;
-    } catch(e){
-      console.warn('Using fallback SAMPLE data — to use your own, add links.json in same folder.', e);
-      return SAMPLE.links;
-    }
-  }
-
-  // Build unique categories and tags
-  function extractFacets(items){
-    const cats = new Set();
-    const tags = new Set();
-    items.forEach(i => { if(i.category) cats.add(i.category); (i.tags||[]).forEach(t=>tags.add(t)); });
-    return { cats: Array.from(cats).sort(), tags: Array.from(tags).sort() };
-  }
-
-  // Render functions
-  function renderGrid(items, options = {}) {
-    grid.innerHTML = '';
-    resultCount.textContent = items.length;
-    if(items.length === 0) {
-      grid.innerHTML = `<div style="grid-column:1/-1; padding:28px; text-align:center; color:var(--muted)">No results — try different filters</div>`;
-      return;
+      render();
     }
 
-    // use DocumentFragment for perf
-    const frag = document.createDocumentFragment();
-    items.forEach(it => {
-      const card = document.createElement('article');
-      card.className = 'card';
-      card.tabIndex = 0;
-      card.setAttribute('data-id', it.id);
-      // media row
-      const media = document.createElement('div');
-      media.className = 'media-row';
-      const thumb = document.createElement('div');
-      thumb.className = 'thumb';
-      // image with lazy loading & fallback
-      const img = document.createElement('img');
-      img.alt = it.title;
-      img.loading = 'lazy';
-      img.style.width = '100%'; img.style.height='100%'; img.style.objectFit='cover';
-      img.src = it.img || '';
-      img.onerror = () => {
-        // simple SVG data URI fallback
-        img.src = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><rect width='100%' height='100%' fill='#f3fbf9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='18' fill='#9aa'>${(it.title||'Link').slice(0,10)}</text></svg>`)}`;
-      };
-      thumb.appendChild(img);
+    function render(filter=""){
+      grid.innerHTML = "";
+      const filtered = links.filter(l => 
+        l.title.toLowerCase().includes(filter) || 
+        (l.desc && l.desc.toLowerCase().includes(filter))
+      );
+      filtered.forEach(link=>{
+        const card = document.createElement("div");
+        card.className="card";
+        card.style.setProperty("--bg-img", `url('${link.img||""}')`);
+        card.style.backgroundImage = `url('${link.img||""}')`;
 
-      const meta = document.createElement('div'); meta.className = 'meta';
-      const title = document.createElement('h3'); title.className = 'title'; title.textContent = it.title;
-      const desc = document.createElement('p'); desc.className = 'desc'; desc.textContent = it.description || '';
-      meta.appendChild(title); meta.appendChild(desc);
-      media.appendChild(thumb); media.appendChild(meta);
-
-      // tag row
-      const tagsRow = document.createElement('div'); tagsRow.className = 'tags';
-      (it.tags||[]).forEach(t=>{
-        const tEl = document.createElement('span'); tEl.className='tag'; tEl.textContent = t;
-        tEl.title = `Filter by ${t}`;
-        tEl.addEventListener('click', ()=> { toggleTagFilter(t); });
-        tagsRow.appendChild(tEl);
-      });
-
-      // badges & actions
-      const badgeRow = document.createElement('div'); badgeRow.className='badge-row';
-      const hint = document.createElement('span'); hint.className='badge hint'; hint.textContent = it.hintEmoji || '🤔'; hint.title = 'Hint';
-      const typeBadge = document.createElement('span'); typeBadge.className = `badge ${it.type==='fruit' ? 'fruit' : 'leaf'}`; typeBadge.textContent = it.type==='fruit' ? 'Fruit' : 'Leaf';
-
-      // action buttons: preview, open, bookmark
-      const openBtn = document.createElement('button'); openBtn.className='btn'; openBtn.textContent = 'Open';
-      openBtn.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        // update popularity
-        popularity[it.id] = (popularity[it.id] || 0) + 1;
-        writeJSON(STORAGE_POP, popularity);
-        if(it.type === 'fruit') safeOpen(it.url); else location.href = it.url;
-        // subtle animation
-        card.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:240});
-        // reapply sorting if needed (optionally)
-      });
-
-      const previewBtn = document.createElement('button'); previewBtn.className='btn secondary'; previewBtn.textContent='Preview';
-      previewBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showModal(it);
-      });
-
-      const bmBtn = document.createElement('button'); bmBtn.className='chip'; bmBtn.textContent = bookmarks[it.id] ? 'Bookmarked' : 'Bookmark';
-      bmBtn.title = bookmarks[it.id] ? 'Remove bookmark' : 'Save bookmark';
-      bmBtn.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        if(bookmarks[it.id]) { delete bookmarks[it.id]; bmBtn.textContent='Bookmark'; }
-        else { bookmarks[it.id] = Date.now(); bmBtn.textContent='Bookmarked'; }
-        writeJSON(STORAGE_BOOK, bookmarks);
-      });
-
-      badgeRow.append(hint, typeBadge, bmBtn, previewBtn, openBtn);
-
-      // Put together
-      card.appendChild(media);
-      if((it.tags||[]).length) card.appendChild(tagsRow);
-      card.appendChild(badgeRow);
-
-      // keyboard: Enter opens preview
-      card.addEventListener('keydown', (ev)=> { if(ev.key==='Enter') showModal(it); });
-
-      // click card opens preview as primary
-      card.addEventListener('click', ()=> showModal(it));
-
-      frag.appendChild(card);
-    });
-
-    grid.appendChild(frag);
-  }
-
-  // Modal preview
-  function showModal(it){
-    modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false');
-    modalContent.innerHTML = `
-      <div style="display:flex;gap:12px;align-items:flex-start;">
-        <div style="width:160px;height:160px;flex-shrink:0;border-radius:12px;overflow:hidden;background:#f6fbf9">
-          <img src="${it.img||''}" alt="${it.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'160\\' height=\\'160\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'#f3fbf9\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'16\\' fill=\\'#9aa\\'>${(it.title||'').slice(0,12)}</text></svg>`) }' />
-        </div>
-        <div style="flex:1">
-          <h2 style="margin:0 0 8px 0">${it.title}</h2>
-          <p style="color:var(--muted);margin:0 0 12px 0">${it.description || ''}</p>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:10px;">
-            <button id="modalOpen" class="btn">Open Link</button>
-            <button id="modalBookmark" class="btn secondary">${bookmarks[it.id] ? 'Bookmarked' : 'Bookmark'}</button>
+        card.innerHTML = `
+          <div class="card-content">
+            <div class="title"><span class="emoji">🤔</span>${link.title}</div>
+            <p class="desc">${link.desc||""}</p>
+            <button class="btn">Go</button>
           </div>
-        </div>
-      </div>
-    `;
-    $('#modalOpen').addEventListener('click', ()=> {
-      popularity[it.id] = (popularity[it.id] || 0) + 1;
-      writeJSON(STORAGE_POP, popularity);
-      if(it.type === 'fruit') safeOpen(it.url); else location.href = it.url;
-    });
-    $('#modalBookmark').addEventListener('click', ()=>{
-      if(bookmarks[it.id]) { delete bookmarks[it.id]; $('#modalBookmark').textContent = 'Bookmark'; }
-      else { bookmarks[it.id] = Date.now(); $('#modalBookmark').textContent = 'Bookmarked'; }
-      writeJSON(STORAGE_BOOK, bookmarks);
-    });
-  }
-
-  // Filtering / search / sorting pipeline
-  let ALL_LINKS = [];
-  let activeTagFilters = new Set();
-  let activeTypeFilter = ''; // '', 'leaf', 'fruit'
-  let activeCategory = '';
-
-  function toggleTagFilter(tag){
-    if(activeTagFilters.has(tag)) activeTagFilters.delete(tag);
-    else activeTagFilters.add(tag);
-    applyFilters();
-  }
-
-  function applyFilters(){
-    const q = (searchInput.value || '').trim().toLowerCase();
-    const sort = sortSelect.value;
-    let results = ALL_LINKS.slice();
-
-    if(activeCategory) results = results.filter(r => r.category === activeCategory);
-    if(activeTypeFilter) results = results.filter(r => r.type === activeTypeFilter);
-    if(activeTagFilters.size) results = results.filter(r => (r.tags||[]).some(t => activeTagFilters.has(t)));
-    if(q) {
-      results = results.filter(r => (r.title + ' ' + (r.description||'') + ' ' + (r.tags||[]).join(' ')).toLowerCase().includes(q));
+        `;
+        card.querySelector(".btn").onclick = (ev)=>{
+          ev.stopPropagation();
+          window.open(link.url,"_blank","noopener,noreferrer");
+        };
+        card.onclick = ()=> window.open(link.url,"_blank","noopener,noreferrer");
+        grid.appendChild(card);
+      });
     }
 
-    // sorting
-    if(sort === 'popular') {
-      results.sort((a,b) => (popularity[b.id]||0) - (popularity[a.id]||0));
-    } else if(sort === 'new') {
-      results.sort((a,b) => (b._added || 0) - (a._added || 0));
-    } else if(sort === 'alpha'){
-      results.sort((a,b)=> a.title.localeCompare(b.title));
-    }
-
-    renderGrid(results);
-    renderFacets(ALL_LINKS);
-  }
-
-  // facets UI
-  function renderFacets(all){
-    const {cats, tags} = extractFacets(all);
-    // categories
-    categorySelect.innerHTML = `<option value="">All categories</option>` + cats.map(c=>`<option value="${c}">${c}</option>`).join('');
-    categorySelect.value = activeCategory;
-    // tags
-    tagsWrap.innerHTML = '';
-    tags.forEach(t=>{
-      const el = document.createElement('button'); el.className='chip'; el.textContent = t;
-      if(activeTagFilters.has(t)) el.classList.add('active');
-      el.addEventListener('click', ()=> { toggleTagFilter(t); el.classList.toggle('active'); });
-      tagsWrap.appendChild(el);
+    searchInput.addEventListener("input",(e)=>{
+      render(e.target.value.toLowerCase());
     });
-  }
 
-  // utility: extract facets
-  function extractFacets(items){
-    const cats = new Set(); const tags = new Set();
-    items.forEach(i => { if(i.category) cats.add(i.category); (i.tags||[]).forEach(t=>tags.add(t)); });
-    return {cats: Array.from(cats).sort(), tags: Array.from(tags).sort()};
-  }
-
-  // init app
-  (async function init(){
-    ALL_LINKS = await loadData();
-    // tag internal timestamp for "new" sorting
-    ALL_LINKS.forEach((l,i)=> l._added = l._added || Date.now() - (i * 1000));
-
-    renderFacets(ALL_LINKS);
-    applyFilters();
-
-    // wire UI
-    searchInput.addEventListener('input', debounce(()=>applyFilters(), 180));
-    $('#clearFilters').addEventListener('click', ()=> {
-      searchInput.value=''; activeTagFilters.clear(); activeTypeFilter=''; activeCategory=''; $('#filterAll').classList.add('active'); $('#filterLeaf').classList.remove('active'); $('#filterFruit').classList.remove('active');
-      applyFilters();
-    });
-    $('#filterAll').addEventListener('click', ()=>{ activeTypeFilter=''; $('#filterAll').classList.add('active'); $('#filterLeaf').classList.remove('active'); $('#filterFruit').classList.remove('active'); applyFilters(); });
-    $('#filterLeaf').addEventListener('click', ()=>{ activeTypeFilter='leaf'; $('#filterAll').classList.remove('active'); $('#filterLeaf').classList.add('active'); $('#filterFruit').classList.remove('active'); applyFilters(); });
-    $('#filterFruit').addEventListener('click', ()=>{ activeTypeFilter='fruit'; $('#filterAll').classList.remove('active'); $('#filterLeaf').classList.remove('active'); $('#filterFruit').classList.add('active'); applyFilters(); });
-    categorySelect.addEventListener('change', ()=> { activeCategory = categorySelect.value; applyFilters(); });
-    sortSelect.addEventListener('change', applyFilters);
-
-    // bookmarks export/clear
-    $('#exportBookmarks').addEventListener('click', ()=>{
-      const payload = JSON.stringify(bookmarks, null, 2);
-      const blob = new Blob([payload], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'bookmarks.json'; a.click(); URL.revokeObjectURL(url);
-    });
-    $('#clearBookmarks').addEventListener('click', ()=> { localStorage.removeItem(STORAGE_BOOK); Object.keys(bookmarks).forEach(k=>delete bookmarks[k]); alert('Bookmarks cleared'); });
-
-    // realtime placeholder
-    $('#realtimeBtn').addEventListener('click', ()=> alert('Realtime placeholder — integrate Ably / WebSockets to push updates.'));
-
-    // sign in placeholder
-    $('#signin').addEventListener('click', ()=> alert('Auth placeholder — integrate Magic.link or other provider here.'));
-
-    // accessibility: Escape closes modal
-    document.addEventListener('keydown', (e)=> { if(e.key === 'Escape'){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); } });
-
-  })();
-
-  // Expose small helper for debugging in console (optional)
-  window.bento = { reload: async ()=>{ ALL_LINKS = await loadData(); applyFilters(); }, get state(){return {popularity: readJSON(STORAGE_POP,{}), bookmarks: readJSON(STORAGE_BOOK,{})}} };
-
+    loadData();
   </script>
 </body>
-        </html>
+</html>

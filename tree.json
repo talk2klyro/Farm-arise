@@ -1,78 +1,60 @@
 {
-  "root": {
-    "name": "Main 🌐",
-    "hint": "(Tap to explore 🌟)",
-    "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg"
-  },
-  "branches": [
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "links": [
     {
-      "name": "Electronics 👉",
-      "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg",
-      "leaves": [
-        {
-          "name": "Laptop 💻",
-          "url": "https://example.com/laptop",
-          "image": "https://i.postimg.cc/cgS31ywR/IMG-20250820-WA0081.jpg"
-        },
-        {
-          "name": "Camera 📷",
-          "url": "https://example.com/camera",
-          "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg"
-        }
-      ],
-      "fruits": [
-        {
-          "name": "Laptop Promo 🍎 (Deal 🎁)",
-          "url": "https://example.com/laptop-promo",
-          "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg"
-        }
-      ]
+      "id": "l1",
+      "title": "Laptop Deal — 20% OFF",
+      "url": "https://example.com/laptop",
+      "img": "https://img.icons8.com/fluency/96/000000/laptop.png",
+      "category": "Electronics",
+      "tags": ["tech","hardware"],
+      "hintEmoji": "🎁",
+      "type": "fruit",
+      "description": "Limited-time laptop promotion — click to view the deal."
     },
     {
-      "name": "Clothing 👉",
-      "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg",
-      "leaves": [
-        {
-          "name": "T-Shirt 👕",
-          "url": "https://example.com/tshirt",
-          "image": "https://i.postimg.cc/cgS31ywR/IMG-20250820-WA0081.jpg"
-        },
-        {
-          "name": "Jacket 🧥",
-          "url": "https://example.com/jacket",
-          "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg"
-        }
-      ],
-      "fruits": [
-        {
-          "name": "Summer Sale 🍒 (Deal ✨)",
-          "url": "https://example.com/summer-sale",
-          "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg"
-        }
-      ]
+      "id": "l2",
+      "title": "Camera Review: Top 5",
+      "url": "https://example.com/camera-review",
+      "img": "https://img.icons8.com/fluency/96/000000/camera.png",
+      "category": "Electronics",
+      "tags": ["review","photography"],
+      "hintEmoji": "🤔",
+      "type": "leaf",
+      "description": "In-depth camera reviews to help you decide."
     },
     {
-      "name": "Home 👉",
-      "image": "https://i.postimg.cc/cgS31ywR/IMG-20250820-WA0081.jpg",
-      "leaves": [
-        {
-          "name": "Lamp 💡",
-          "url": "https://example.com/lamp",
-          "image": "https://i.postimg.cc/4KttTN74/IMG-20250820-WA0078.jpg"
-        },
-        {
-          "name": "Rug 🧶",
-          "url": "https://example.com/rug",
-          "image": "https://i.postimg.cc/87xW3rCn/IMG-20250820-WA0064.jpg"
-        }
-      ],
-      "fruits": [
-        {
-          "name": "Decor Promo 🎁 (Deal ✨)",
-          "url": "https://example.com/decor-promo",
-          "image": "https://i.postimg.cc/cgS31ywR/IMG-20250820-WA0081.jpg"
-        }
-      ]
+      "id": "l3",
+      "title": "Cool T-Shirt",
+      "url": "https://example.com/tshirt",
+      "img": "https://img.icons8.com/fluency/96/000000/t-shirt.png",
+      "category": "Clothing",
+      "tags": ["fashion"],
+      "hintEmoji": "👍",
+      "type": "leaf",
+      "description": "Comfortable graphic tee."
+    },
+    {
+      "id": "l4",
+      "title": "Summer Sale - Jackets",
+      "url": "https://example.com/jackets",
+      "img": "https://img.icons8.com/fluency/96/000000/jacket.png",
+      "category": "Clothing",
+      "tags": ["sale","seasonal"],
+      "hintEmoji": "🎁",
+      "type": "fruit",
+      "description": "Seasonal jackets sale — limited stock."
+    },
+    {
+      "id": "l5",
+      "title": "Travel Guide: Bali",
+      "url": "https://example.com/bali",
+      "img": "https://img.icons8.com/fluency/96/000000/beach.png",
+      "category": "Travel",
+      "tags": ["travel","guide"],
+      "hintEmoji": "🤩",
+      "type": "leaf",
+      "description": "Top tips and an itinerary for Bali."
     }
   ]
 }

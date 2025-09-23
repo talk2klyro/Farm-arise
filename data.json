@@ -4,35 +4,138 @@
     "title": "Post 1",
     "excerpt": "A visual story begins here with the first uploaded image.",
     "image": "https://i.postimg.cc/z3BJqDmJ/0053f21ea2aa000f4d24fc3d7baa5c3f.jpg",
-    "content": "# Post 1\n\nThis is the start of the journey with my blog. \n\n![cover](https://i.postimg.cc/z3BJqDmJ/0053f21ea2aa000f4d24fc3d7baa5c3f.jpg)"
+    "content": "# Post 1\n\nWelcome to my blog! This is where my journey begins.\n\n![cover](https://i.postimg.cc/z3BJqDmJ/0053f21ea2aa000f4d24fc3d7baa5c3f.jpg)"
   },
   {
     "id": 2,
     "title": "Post 2",
     "excerpt": "Another entry with my next uploaded image.",
     "image": "https://i.postimg.cc/PCzGm0G3/03533a2ae0c28308d159919108dd9492.jpg",
-    "content": "# Post 2\n\nSharing my second update in this blog series.\n\n![cover](https://i.postimg.cc/PCzGm0G3/03533a2ae0c28308d159919108dd9492.jpg)"
+    "content": "# Post 2\n\nAnother chapter of my story.\n\n![cover](https://i.postimg.cc/PCzGm0G3/03533a2ae0c28308d159919108dd9492.jpg)"
   },
   {
     "id": 3,
     "title": "Post 3",
     "excerpt": "Turning blog posts into a visual journal.",
     "image": "https://i.postimg.cc/0rB9jgx7/06c18964f037c762c7bb37772681b258.jpg",
-    "content": "# Post 3\n\nHere’s another step in my blog journey.\n\n![cover](https://i.postimg.cc/0rB9jgx7/06c18964f037c762c7bb37772681b258.jpg)"
+    "content": "# Post 3\n\nAdding another update with visuals.\n\n![cover](https://i.postimg.cc/0rB9jgx7/06c18964f037c762c7bb37772681b258.jpg)"
   },
   {
     "id": 4,
     "title": "Post 4",
     "excerpt": "Captured moments continue with fresh imagery.",
     "image": "https://i.postimg.cc/7Ghpr65d/09b344a7314bead03ed77da586cda314.jpg",
-    "content": "# Post 4\n\nBlogging visually and sharing new ideas.\n\n![cover](https://i.postimg.cc/7Ghpr65d/09b344a7314bead03ed77da586cda314.jpg)"
+    "content": "# Post 4\n\nA glimpse into new ideas.\n\n![cover](https://i.postimg.cc/7Ghpr65d/09b344a7314bead03ed77da586cda314.jpg)"
   },
   {
     "id": 5,
     "title": "Post 5",
     "excerpt": "Continuing the blog series with style and images.",
     "image": "https://i.postimg.cc/pp3V0w6P/0a3ccabd5c61ba948d82a2a3c40fa812.jpg",
-    "content": "# Post 5\n\nEach blog post grows this journey further.\n\n![cover](https://i.postimg.cc/pp3V0w6P/0a3ccabd5c61ba948d82a2a3c40fa812.jpg)"
+    "content": "# Post 5\n\nThe journey keeps growing.\n\n![cover](https://i.postimg.cc/pp3V0w6P/0a3ccabd5c61ba948d82a2a3c40fa812.jpg)"
+  },
+  {
+    "id": 6,
+    "title": "Post 6",
+    "excerpt": "Another step forward with my blogging journey.",
+    "image": "https://i.postimg.cc/RqsZt616/1864bd48518105c06d580dae07233cab.jpg",
+    "content": "# Post 6\n\nContinuing my story visually.\n\n![cover](https://i.postimg.cc/RqsZt616/1864bd48518105c06d580dae07233cab.jpg)"
+  },
+  {
+    "id": 7,
+    "title": "Post 7",
+    "excerpt": "Sharing thoughts and visuals through images.",
+    "image": "https://i.postimg.cc/K4wyFnrN/19672a289fb403572b49e3ecdf8b2ff3.jpg",
+    "content": "# Post 7\n\nMy journey keeps expanding.\n\n![cover](https://i.postimg.cc/K4wyFnrN/19672a289fb403572b49e3ecdf8b2ff3.jpg)"
+  },
+  {
+    "id": 8,
+    "title": "Post 8",
+    "excerpt": "Blogging through my uploaded gallery.",
+    "image": "https://i.postimg.cc/Wtb4t6Zc/19a4e099220ec71c98ac2e16e182000d.jpg",
+    "content": "# Post 8\n\nBringing images to life through stories.\n\n![cover](https://i.postimg.cc/Wtb4t6Zc/19a4e099220ec71c98ac2e16e182000d.jpg)"
+  },
+  {
+    "id": 9,
+    "title": "Post 9",
+    "excerpt": "Another day, another blog update with visuals.",
+    "image": "https://i.postimg.cc/zbd8T6hZ/1a06a07d95d687677e1f49415ffb849c.jpg",
+    "content": "# Post 9\n\nAdding my ninth entry.\n\n![cover](https://i.postimg.cc/zbd8T6hZ/1a06a07d95d687677e1f49415ffb849c.jpg)"
+  },
+  {
+    "id": 10,
+    "title": "Post 10",
+    "excerpt": "More stories told through pictures.",
+    "image": "https://i.postimg.cc/4Hd4MsGx/1a6ac39227e60d196d2215064b45b04a.jpg",
+    "content": "# Post 10\n\nContinuing strong with my tenth blog post.\n\n![cover](https://i.postimg.cc/4Hd4MsGx/1a6ac39227e60d196d2215064b45b04a.jpg)"
+  },
+  {
+    "id": 11,
+    "title": "Post 11",
+    "excerpt": "Keeping the rhythm of blogging alive.",
+    "image": "https://i.postimg.cc/rdQvHWw5/2036bb87e3cbcf9830810402c3babdc9.jpg",
+    "content": "# Post 11\n\nMore inspiration shared.\n\n![cover](https://i.postimg.cc/rdQvHWw5/2036bb87e3cbcf9830810402c3babdc9.jpg)"
+  },
+  {
+    "id": 12,
+    "title": "Post 12",
+    "excerpt": "Building momentum with visuals.",
+    "image": "https://i.postimg.cc/LgYKLXRL/4bbe96966279c29a8ac100a707482f14.jpg",
+    "content": "# Post 12\n\nSharing another image-driven story.\n\n![cover](https://i.postimg.cc/LgYKLXRL/4bbe96966279c29a8ac100a707482f14.jpg)"
+  },
+  {
+    "id": 13,
+    "title": "Post 13",
+    "excerpt": "Lucky 13: another blog update.",
+    "image": "https://i.postimg.cc/HJDxLqw6/50f405372b6cd54d7877043f4a4fd131.jpg",
+    "content": "# Post 13\n\nKeeping the creative flow.\n\n![cover](https://i.postimg.cc/HJDxLqw6/50f405372b6cd54d7877043f4a4fd131.jpg)"
+  },
+  {
+    "id": 14,
+    "title": "Post 14",
+    "excerpt": "Sharing my fourteenth visual moment.",
+    "image": "https://i.postimg.cc/8F12wwN1/531fb99368a4b8d098194e75cd392865.jpg",
+    "content": "# Post 14\n\nAnother update with imagery.\n\n![cover](https://i.postimg.cc/8F12wwN1/531fb99368a4b8d098194e75cd392865.jpg)"
+  },
+  {
+    "id": 15,
+    "title": "Post 15",
+    "excerpt": "Halfway to 30 with this post.",
+    "image": "https://i.postimg.cc/PLWqvSKT/589e8449ead54491bccecffc4264d450.jpg",
+    "content": "# Post 15\n\nAnother milestone.\n\n![cover](https://i.postimg.cc/PLWqvSKT/589e8449ead54491bccecffc4264d450.jpg)"
+  },
+  {
+    "id": 16,
+    "title": "Post 16",
+    "excerpt": "Another step in the creative journey.",
+    "image": "https://i.postimg.cc/JsWVHMFH/5b5616256ec65a525509e876ddf30c8b.jpg",
+    "content": "# Post 16\n\nDocumenting my path.\n\n![cover](https://i.postimg.cc/JsWVHMFH/5b5616256ec65a525509e876ddf30c8b.jpg)"
+  },
+  {
+    "id": 17,
+    "title": "Post 17",
+    "excerpt": "Seventeenth entry with new visuals.",
+    "image": "https://i.postimg.cc/gX0PcsTM/607b2866059d0f666de4f99df0b5f61e.jpg",
+    "content": "# Post 17\n\nMore stories to tell.\n\n![cover](https://i.postimg.cc/gX0PcsTM/607b2866059d0f666de4f99df0b5f61e.jpg)"
+  },
+  {
+    "id": 18,
+    "title": "Post 18",
+    "excerpt": "Eighteen posts strong and counting.",
+    "image": "https://i.postimg.cc/FdFhdN7V/649211af196237d19c4925793b30aa88.jpg",
+    "content": "# Post 18\n\nAnother addition to the blog.\n\n![cover](https://i.postimg.cc/FdFhdN7V/649211af196237d19c4925793b30aa88.jpg)"
+  },
+  {
+    "id": 19,
+    "title": "Post 19",
+    "excerpt": "Nineteenth blog entry with visual vibes.",
+    "image": "https://i.postimg.cc/N52BrNfS/6d4c4161404bd41251273cbb0787a803.jpg",
+    "content": "# Post 19\n\nBuilding momentum visually.\n\n![cover](https://i.postimg.cc/N52BrNfS/6d4c4161404bd41251273cbb0787a803.jpg)"
+  },
+  {
+    "id": 20,
+    "title": "Post 20",
+    "excerpt": "Twenty posts strong! A nice milestone.",
+    "image": "https://i.postimg.cc/bGhyPQPM/76c91abf870a8bee96c1bd04aebec12c.jpg",
+    "content": "# Post 20\n\nBig milestone reached.\n\n![cover](https://i.postimg.cc/bGhyPQPM/76c91abf870a8bee96c1bd04aebec12c.jpg)"
   }
-  // … continue like this for all images … //
-]

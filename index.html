@@ -133,6 +133,141 @@
 
       // create control points to form a nice curved palm branch
       curvePoints.push(top.clone());
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Interactive Palm — WebGL (Three.js)</title>
+  <style>
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    #canvas-wrap{position:fixed;inset:0;background:linear-gradient(180deg,#b9e6ff 0%, #f0f9ff 35%, #e9f7ee 100%)}
+    #ui{position:absolute;left:12px;top:12px;z-index:10;backdrop-filter:blur(6px);padding:10px;border-radius:8px}
+    #ui h3{margin:0 0 6px 0;font-size:14px}
+    #ui p{margin:0;font-size:12px;opacity:.9}
+    .btn{display:inline-block;margin-top:8px;padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
+    #legend{position:absolute;right:12px;top:12px;background:rgba(255,255,255,0.85);padding:8px;border-radius:8px;font-size:12px}
+    #credits{position:absolute;left:12px;bottom:12px;font-size:12px;color:#033}
+    canvas{display:block}
+  </style>
+</head>
+<body>
+  <div id="canvas-wrap"></div>
+  <div id="ui">
+    <h3>Interactive Palm — WebGL</h3>
+    <p>Curved branches, leaves (internal links) and fruits (external promos). Hover to preview, click to follow. Popularity reorders items.</p>
+    <button id="toggle-sway" class="btn">Toggle gentle sway</button>
+    <button id="reseed" class="btn">Randomize layout</button>
+  </div>
+  <div id="legend">Tip: Drag to orbit • Scroll to zoom</div>
+  <div id="credits">Built with Three.js • Single-file demo</div>  <script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.154.0/build/three.module.js';
+  import { OrbitControls } from 'https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js';
+
+  // ---------- Sample JSON data structure (editable) ----------
+  const TREE_DATA = {
+    trunkEmoji: '🌴',
+    branches: [
+      {
+        name: 'Electronics',
+        angleDeg: -38,
+        leaves: [
+          { id: 'phones', label: 'Phones', url: '/electronics/phones', internal: true, clicks: 0 },
+          { id: 'laptops', label: 'Laptops', url: '/electronics/laptops', internal: true, clicks: 0 },
+          { id: 'audio', label: 'Audio', url: '/electronics/audio', internal: true, clicks: 0 }
+        ],
+        fruits: [
+          { id: 'elec-sale', label: 'Holiday Sale', url: 'https://example.com/sale', internal: false, clicks: 0 }
+        ]
+      },
+      {
+        name: 'Clothing',
+        angleDeg: 38,
+        leaves: [
+          { id: 'mens', label: "Men's", url: '/clothing/mens', internal: true, clicks: 0 },
+          { id: 'womens', label: "Women's", url: '/clothing/womens', internal: true, clicks: 0 }
+        ],
+        fruits: [
+          { id: 'cloth-deal', label: '30% Off', url: 'https://example.com/cloth', internal: false, clicks: 0 },
+        ]
+      }
+    ]
+  };
+
+  // ---------- Scene setup ----------
+  const container = document.getElementById('canvas-wrap');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 2000);
+  camera.position.set(0, 6, 12);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 3, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.07;
+
+  // lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+  dir.position.set(5, 10, 3);
+  scene.add(dir);
+
+  // ground (subtle)
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(60, 60),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.01;
+  scene.add(ground);
+
+  // utility arrays
+  const pickable = [];
+
+  // ---------- Trunk (emoji sprite + cylinder) ----------
+  const trunkHeight = 3.6;
+  const trunkGeo = new THREE.CylinderGeometry(0.45, 0.6, trunkHeight, 12);
+  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x9b6b3a, roughness: 0.9 });
+  const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+  trunk.position.y = trunkHeight / 2;
+  scene.add(trunk);
+
+  // emoji sprite at top of trunk
+  const emojiSprite = makeEmojiSprite(TREE_DATA.trunkEmoji, 120);
+  emojiSprite.position.set(0, trunk.position.y + trunkHeight / 2 + 0.08, 0);
+  scene.add(emojiSprite);
+
+  // ---------- Branch generator ----------
+  // We'll create curved branches using CatmullRomCurve3 and TubeGeometry.
+  const branchGroup = new THREE.Group();
+  scene.add(branchGroup);
+
+  // store branch metadata for later animations & positioning
+  const BRANCHES = [];
+
+  // seed random but stable
+  function rand(seed = 1) { let x = Math.sin(seed) * 10000; return x - Math.floor(x); }
+
+  function buildTree() {
+    // clear previous
+    BRANCHES.forEach(b => { if (b.mesh) branchGroup.remove(b.mesh); b.leafObjects?.forEach(o=>scene.remove(o)); b.fruitObjects?.forEach(o=>scene.remove(o)); });
+    BRANCHES.length = 0;
+
+    const top = new THREE.Vector3(0, trunk.position.y + trunkHeight / 2, 0);
+    const baseRadius = 1.8;
+
+    TREE_DATA.branches.forEach((bData, bi) => {
+      const angle = THREE.MathUtils.degToRad(bData.angleDeg || (bi * 40 - 20));
+      const length = 4.4 + (bi % 2) * 0.4;
+      const curvePoints = [];
+
+      // create control points to form a nice curved palm branch
+      curvePoints.push(top.clone());
       const mid1 = new THREE.Vector3(Math.cos(angle) * (baseRadius + 0.9), top.y + 0.6, Math.sin(angle) * (baseRadius + 0.9));
       const mid2 = new THREE.Vector3(Math.cos(angle) * (baseRadius + length * 0.4), top.y + 0.9, Math.sin(angle) * (baseRadius + length * 0.4));
       const tip  = new THREE.Vector3(Math.cos(angle) * (baseRadius + length), top.y + 0.4, Math.sin(angle) * (baseRadius + length));
@@ -457,4 +592,4 @@
 
   // ---------- END MODULE ----------
   </script></body>
-  </html>
+</html>

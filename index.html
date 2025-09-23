@@ -1,595 +1,545 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Interactive Palm — WebGL (Three.js)</title>
+  <title>Bento Showcase — Links & Promos</title>
+  <meta name="description" content="Professional link showcase (bento/grid) with images, emoji hints, search, filters, tags, bookmarks, popularity and progressive enhancement." />
+  <meta name="theme-color" content="#0b6b58" />
   <style>
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial}
-    #canvas-wrap{position:fixed;inset:0;background:linear-gradient(180deg,#b9e6ff 0%, #f0f9ff 35%, #e9f7ee 100%)}
-    #ui{position:absolute;left:12px;top:12px;z-index:10;backdrop-filter:blur(6px);padding:10px;border-radius:8px}
-    #ui h3{margin:0 0 6px 0;font-size:14px}
-    #ui p{margin:0;font-size:12px;opacity:.9}
-    .btn{display:inline-block;margin-top:8px;padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
-    #legend{position:absolute;right:12px;top:12px;background:rgba(255,255,255,0.85);padding:8px;border-radius:8px;font-size:12px}
-    #credits{position:absolute;left:12px;bottom:12px;font-size:12px;color:#033}
-    canvas{display:block}
-  </style>
-</head>
-<body>
-  <div id="canvas-wrap"></div>
-  <div id="ui">
-    <h3>Interactive Palm — WebGL</h3>
-    <p>Curved branches, leaves (internal links) and fruits (external promos). Hover to preview, click to follow. Popularity reorders items.</p>
-    <button id="toggle-sway" class="btn">Toggle gentle sway</button>
-    <button id="reseed" class="btn">Randomize layout</button>
-  </div>
-  <div id="legend">Tip: Drag to orbit • Scroll to zoom</div>
-  <div id="credits">Built with Three.js • Single-file demo</div>  <script type="module">
-  import * as THREE from 'https://unpkg.com/three@0.154.0/build/three.module.js';
-  import { OrbitControls } from 'https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js';
-
-  // ---------- Sample JSON data structure (editable) ----------
-  const TREE_DATA = {
-    trunkEmoji: '🌴',
-    branches: [
-      {
-        name: 'Electronics',
-        angleDeg: -38,
-        leaves: [
-          { id: 'phones', label: 'Phones', url: '/electronics/phones', internal: true, clicks: 0 },
-          { id: 'laptops', label: 'Laptops', url: '/electronics/laptops', internal: true, clicks: 0 },
-          { id: 'audio', label: 'Audio', url: '/electronics/audio', internal: true, clicks: 0 }
-        ],
-        fruits: [
-          { id: 'elec-sale', label: 'Holiday Sale', url: 'https://example.com/sale', internal: false, clicks: 0 }
-        ]
-      },
-      {
-        name: 'Clothing',
-        angleDeg: 38,
-        leaves: [
-          { id: 'mens', label: "Men's", url: '/clothing/mens', internal: true, clicks: 0 },
-          { id: 'womens', label: "Women's", url: '/clothing/womens', internal: true, clicks: 0 }
-        ],
-        fruits: [
-          { id: 'cloth-deal', label: '30% Off', url: 'https://example.com/cloth', internal: false, clicks: 0 },
-        ]
-      }
-    ]
-  };
-
-  // ---------- Scene setup ----------
-  const container = document.getElementById('canvas-wrap');
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 2000);
-  camera.position.set(0, 6, 12);
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.appendChild(renderer.domElement);
-
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(0, 3, 0);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.07;
-
-  // lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-  dir.position.set(5, 10, 3);
-  scene.add(dir);
-
-  // ground (subtle)
-  const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(60, 60),
-    new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 })
-  );
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.01;
-  scene.add(ground);
-
-  // utility arrays
-  const pickable = [];
-
-  // ---------- Trunk (emoji sprite + cylinder) ----------
-  const trunkHeight = 3.6;
-  const trunkGeo = new THREE.CylinderGeometry(0.45, 0.6, trunkHeight, 12);
-  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x9b6b3a, roughness: 0.9 });
-  const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-  trunk.position.y = trunkHeight / 2;
-  scene.add(trunk);
-
-  // emoji sprite at top of trunk
-  const emojiSprite = makeEmojiSprite(TREE_DATA.trunkEmoji, 120);
-  emojiSprite.position.set(0, trunk.position.y + trunkHeight / 2 + 0.08, 0);
-  scene.add(emojiSprite);
-
-  // ---------- Branch generator ----------
-  // We'll create curved branches using CatmullRomCurve3 and TubeGeometry.
-  const branchGroup = new THREE.Group();
-  scene.add(branchGroup);
-
-  // store branch metadata for later animations & positioning
-  const BRANCHES = [];
-
-  // seed random but stable
-  function rand(seed = 1) { let x = Math.sin(seed) * 10000; return x - Math.floor(x); }
-
-  function buildTree() {
-    // clear previous
-    BRANCHES.forEach(b => { if (b.mesh) branchGroup.remove(b.mesh); b.leafObjects?.forEach(o=>scene.remove(o)); b.fruitObjects?.forEach(o=>scene.remove(o)); });
-    BRANCHES.length = 0;
-
-    const top = new THREE.Vector3(0, trunk.position.y + trunkHeight / 2, 0);
-    const baseRadius = 1.8;
-
-    TREE_DATA.branches.forEach((bData, bi) => {
-      const angle = THREE.MathUtils.degToRad(bData.angleDeg || (bi * 40 - 20));
-      const length = 4.4 + (bi % 2) * 0.4;
-      const curvePoints = [];
-
-      // create control points to form a nice curved palm branch
-      curvePoints.push(top.clone());
-<!doctype html>
-
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Interactive Palm — WebGL (Three.js)</title>
-  <style>
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial}
-    #canvas-wrap{position:fixed;inset:0;background:linear-gradient(180deg,#b9e6ff 0%, #f0f9ff 35%, #e9f7ee 100%)}
-    #ui{position:absolute;left:12px;top:12px;z-index:10;backdrop-filter:blur(6px);padding:10px;border-radius:8px}
-    #ui h3{margin:0 0 6px 0;font-size:14px}
-    #ui p{margin:0;font-size:12px;opacity:.9}
-    .btn{display:inline-block;margin-top:8px;padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
-    #legend{position:absolute;right:12px;top:12px;background:rgba(255,255,255,0.85);padding:8px;border-radius:8px;font-size:12px}
-    #credits{position:absolute;left:12px;bottom:12px;font-size:12px;color:#033}
-    canvas{display:block}
-  </style>
-</head>
-<body>
-  <div id="canvas-wrap"></div>
-  <div id="ui">
-    <h3>Interactive Palm — WebGL</h3>
-    <p>Curved branches, leaves (internal links) and fruits (external promos). Hover to preview, click to follow. Popularity reorders items.</p>
-    <button id="toggle-sway" class="btn">Toggle gentle sway</button>
-    <button id="reseed" class="btn">Randomize layout</button>
-  </div>
-  <div id="legend">Tip: Drag to orbit • Scroll to zoom</div>
-  <div id="credits">Built with Three.js • Single-file demo</div>  <script type="module">
-  import * as THREE from 'https://unpkg.com/three@0.154.0/build/three.module.js';
-  import { OrbitControls } from 'https://unpkg.com/three@0.154.0/examples/jsm/controls/OrbitControls.js';
-
-  // ---------- Sample JSON data structure (editable) ----------
-  const TREE_DATA = {
-    trunkEmoji: '🌴',
-    branches: [
-      {
-        name: 'Electronics',
-        angleDeg: -38,
-        leaves: [
-          { id: 'phones', label: 'Phones', url: '/electronics/phones', internal: true, clicks: 0 },
-          { id: 'laptops', label: 'Laptops', url: '/electronics/laptops', internal: true, clicks: 0 },
-          { id: 'audio', label: 'Audio', url: '/electronics/audio', internal: true, clicks: 0 }
-        ],
-        fruits: [
-          { id: 'elec-sale', label: 'Holiday Sale', url: 'https://example.com/sale', internal: false, clicks: 0 }
-        ]
-      },
-      {
-        name: 'Clothing',
-        angleDeg: 38,
-        leaves: [
-          { id: 'mens', label: "Men's", url: '/clothing/mens', internal: true, clicks: 0 },
-          { id: 'womens', label: "Women's", url: '/clothing/womens', internal: true, clicks: 0 }
-        ],
-        fruits: [
-          { id: 'cloth-deal', label: '30% Off', url: 'https://example.com/cloth', internal: false, clicks: 0 },
-        ]
-      }
-    ]
-  };
-
-  // ---------- Scene setup ----------
-  const container = document.getElementById('canvas-wrap');
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 2000);
-  camera.position.set(0, 6, 12);
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.appendChild(renderer.domElement);
-
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(0, 3, 0);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.07;
-
-  // lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-  dir.position.set(5, 10, 3);
-  scene.add(dir);
-
-  // ground (subtle)
-  const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(60, 60),
-    new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 })
-  );
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.01;
-  scene.add(ground);
-
-  // utility arrays
-  const pickable = [];
-
-  // ---------- Trunk (emoji sprite + cylinder) ----------
-  const trunkHeight = 3.6;
-  const trunkGeo = new THREE.CylinderGeometry(0.45, 0.6, trunkHeight, 12);
-  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x9b6b3a, roughness: 0.9 });
-  const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-  trunk.position.y = trunkHeight / 2;
-  scene.add(trunk);
-
-  // emoji sprite at top of trunk
-  const emojiSprite = makeEmojiSprite(TREE_DATA.trunkEmoji, 120);
-  emojiSprite.position.set(0, trunk.position.y + trunkHeight / 2 + 0.08, 0);
-  scene.add(emojiSprite);
-
-  // ---------- Branch generator ----------
-  // We'll create curved branches using CatmullRomCurve3 and TubeGeometry.
-  const branchGroup = new THREE.Group();
-  scene.add(branchGroup);
-
-  // store branch metadata for later animations & positioning
-  const BRANCHES = [];
-
-  // seed random but stable
-  function rand(seed = 1) { let x = Math.sin(seed) * 10000; return x - Math.floor(x); }
-
-  function buildTree() {
-    // clear previous
-    BRANCHES.forEach(b => { if (b.mesh) branchGroup.remove(b.mesh); b.leafObjects?.forEach(o=>scene.remove(o)); b.fruitObjects?.forEach(o=>scene.remove(o)); });
-    BRANCHES.length = 0;
-
-    const top = new THREE.Vector3(0, trunk.position.y + trunkHeight / 2, 0);
-    const baseRadius = 1.8;
-
-    TREE_DATA.branches.forEach((bData, bi) => {
-      const angle = THREE.MathUtils.degToRad(bData.angleDeg || (bi * 40 - 20));
-      const length = 4.4 + (bi % 2) * 0.4;
-      const curvePoints = [];
-
-      // create control points to form a nice curved palm branch
-      curvePoints.push(top.clone());
-      const mid1 = new THREE.Vector3(Math.cos(angle) * (baseRadius + 0.9), top.y + 0.6, Math.sin(angle) * (baseRadius + 0.9));
-      const mid2 = new THREE.Vector3(Math.cos(angle) * (baseRadius + length * 0.4), top.y + 0.9, Math.sin(angle) * (baseRadius + length * 0.4));
-      const tip  = new THREE.Vector3(Math.cos(angle) * (baseRadius + length), top.y + 0.4, Math.sin(angle) * (baseRadius + length));
-
-      curvePoints.push(mid1, mid2, tip);
-      const curve = new THREE.CatmullRomCurve3(curvePoints);
-
-      // tube geometry for branch
-      const tubularSegments = Math.max(20, Math.floor(8 + length * 8));
-      const radiusFunc = (u)=>0.12 * (1 - u * 0.85) + 0.02;
-      const tubeGeom = new THREE.TubeGeometry(curve, tubularSegments, 0.12, 6, false);
-      const mat = new THREE.MeshStandardMaterial({ color: 0x6b3f2a, metalness: 0.05, roughness: 0.95 });
-      const mesh = new THREE.Mesh(tubeGeom, mat);
-      branchGroup.add(mesh);
-
-      // add a label near branch base
-      const labelSprite = makeTextSprite(bData.name, {fontsize:18, padding:6, bgColor:'rgba(255,255,255,0.9)'});
-      const labelPos = curve.getPoint(0.18);
-      labelSprite.position.copy(labelPos).add(new THREE.Vector3(0,0.12,0));
-      labelSprite.scale.setScalar(0.9);
-      scene.add(labelSprite);
-
-      // create leaves and fruits along t values
-      const leafCount = bData.leaves.length;
-      const fruitCount = bData.fruits.length;
-
-      const leafObjects = [];
-      const fruitObjects = [];
-
-      // leaves: use Sprites (lightweight) with canvas textures so we can show labels and simple icons
-      bData.leaves.forEach((leaf, i) => {
-        const t = 0.35 + (i / Math.max(1, leafCount)) * 0.45; // along the branch
-        const pos = curve.getPoint(t);
-        const tangent = curve.getTangent(t).normalize();
-        const normal = new THREE.Vector3().crossVectors(tangent, new THREE.Vector3(0,1,0)).normalize();
-        const offset = normal.clone().multiplyScalar(0.6 + 0.08 * (i % 2));
-        const finalPos = pos.clone().add(offset).add(new THREE.Vector3(0, -0.02 * i, 0));
-
-        const sprite = makeLeafSprite(leaf.label);
-        sprite.position.copy(finalPos);
-        sprite.userData = { type: 'leaf', data: leaf, branchIndex: bi, t, basePos: finalPos.clone(), hover: false };
-        sprite.scale.set(0.8, 0.8, 0.8);
-        scene.add(sprite);
-        pickable.push(sprite);
-        leafObjects.push(sprite);
-      });
-
-      // fruits: spheres that "hang" (slightly below curve)
-      bData.fruits.forEach((fruit, i) => {
-        const t = 0.45 + (i / Math.max(1, fruitCount)) * 0.38;
-        const pos = curve.getPoint(t);
-        const hang = new THREE.Vector3(0, -0.35 - 0.08*i, 0);
-        const finalPos = pos.clone().add(hang);
-        const geom = new THREE.SphereGeometry(0.18, 16, 12);
-        const matF = new THREE.MeshStandardMaterial({ color: 0xff5a5a, emissive:0x000000, roughness:0.6 });
-        const meshF = new THREE.Mesh(geom, matF);
-        meshF.position.copy(finalPos);
-        meshF.userData = { type: 'fruit', data: fruit, branchIndex: bi, t, basePos: finalPos.clone(), hover:false };
-        scene.add(meshF);
-        pickable.push(meshF);
-        fruitObjects.push(meshF);
-
-        // tiny stem as cylinder
-        const stemGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.18, 6);
-        const stem = new THREE.Mesh(stemGeo, new THREE.MeshStandardMaterial({ color:0x6b3f2a }));
-        stem.position.copy(pos.clone().add(hang.clone().multiplyScalar(0.45)));
-        stem.lookAt(finalPos);
-        stem.rotateX(Math.PI/2);
-        scene.add(stem);
-      });
-
-      BRANCHES.push({ curve, mesh, labelSprite, leafObjects, fruitObjects, bData, angle });
-    });
-  }
-
-  // ---------- Helper texture/sprite creators ----------
-  function makeEmojiSprite(emoji='🌴', size = 120){
-    const c = document.createElement('canvas'); c.width = c.height = size;
-    const ctx = c.getContext('2d');
-    ctx.font = Math.floor(size*0.8)+'px serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(emoji, size/2, size/2+6);
-    const tex = new THREE.CanvasTexture(c);
-    const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
-    const spr = new THREE.Sprite(mat);
-    spr.scale.set(1.4,1.4,1);
-    return spr;
-  }
-
-  function makeTextSprite(text, opts={fontsize:20,padding:8,bgColor:'rgba(255,255,255,0.95)'}){
-    const font = `${opts.fontsize||20}px sans-serif`;
-    const padding = opts.padding||8;
-    const c = document.createElement('canvas');
-    const ctx = c.getContext('2d');
-    ctx.font = font;
-    const metrics = ctx.measureText(text);
-    const w = Math.ceil(metrics.width) + padding*2;
-    const h = Math.ceil((opts.fontsize||20) * 1.4) + padding*2;
-    c.width = w; c.height = h;
-    ctx.fillStyle = opts.bgColor || 'rgba(255,255,255,0.95)';
-    roundRect(ctx, 0, 0, w, h, 6); ctx.fill();
-    ctx.fillStyle = '#000'; ctx.font = font; ctx.textBaseline='middle'; ctx.textAlign='center';
-    ctx.fillText(text, w/2, h/2);
-    const tex = new THREE.CanvasTexture(c);
-    const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
-    const spr = new THREE.Sprite(mat);
-    spr.scale.set(w/80, h/80, 1);
-    return spr;
-  }
-
-  function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-
-  function makeLeafSprite(label){
-    const w = 220, h = 120;
-    const c = document.createElement('canvas'); c.width=w; c.height=h;
-    const ctx = c.getContext('2d');
-    // leaf shape background
-    ctx.fillStyle = 'rgba(64,160,64,0.95)';
-    ctx.beginPath(); ctx.ellipse(w*0.5,h*0.5,w*0.46,h*0.42,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = '20px sans-serif'; ctx.textBaseline='middle'; ctx.textAlign='center';
-    ctx.fillText(label, w/2, h/2);
-    const tex = new THREE.CanvasTexture(c);
-    const mat = new THREE.SpriteMaterial({ map: tex });
-    const spr = new THREE.Sprite(mat);
-    spr.scale.set(1.4, 0.8, 1);
-    return spr;
-  }
-
-  // ---------- Interaction: raycasting for hover & clicks ----------
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2(-1,-1);
-
-  function onPointerMove(e){
-    pointer.x = (e.clientX / innerWidth) * 2 - 1;
-    pointer.y = -(e.clientY / innerHeight) * 2 + 1;
-  }
-  window.addEventListener('pointermove', onPointerMove);
-
-  function onPointerDown(e){
-    // raycast
-    raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(pickable, true);
-    if(hits.length){
-      const o = hits[0].object;
-      handleClickObject(o);
+    /* ---------- Minimal reset & theme vars ---------- */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; -webkit-font-smoothing:antialiased;}
+    :root{
+      --bg: #f4f9f8;
+      --card: #ffffff;
+      --muted: #5f6b6a;
+      --accent: #0b6b58;
+      --accent-2: #0f9d70;
+      --leaf: #dff5e6;
+      --fruit: #fff4e1;
+      --radius: 12px;
+      --gap: 14px;
+      --max-width: 1200px;
+      --shadow: 0 10px 30px rgba(16,24,24,0.06);
     }
-  }
-  window.addEventListener('pointerdown', onPointerDown);
 
-  function handleClickObject(obj){
-    const ud = obj.userData || {};
-    if(!ud.type) return;
-    const item = ud.data;
-    // visual click animation
-    const baseScale = obj.scale ? obj.scale.clone() : new THREE.Vector3(1,1,1);
-    // pulse
-    new TWEEN.Tween({s:1})
-      .to({s:1.25}, 160).easing(TWEEN.Easing.Quadratic.Out)
-      .onUpdate(({s})=>{ if(obj.scale) obj.scale.set(baseScale.x*s, baseScale.y*s, baseScale.z*s); })
-      .yoyo(true).repeat(1).start();
+    body { background: linear-gradient(135deg,#f0fbfa 0%, #e6f7f2 100%); padding: clamp(10px,2.2vw,28px); display:flex; justify-content:center; }
+    .wrap { width:100%; max-width:var(--max-width); display:flex; flex-direction:column; gap:var(--gap); }
 
-    // increment clicks for popularity and reorder
-    item.clicks = (item.clicks||0) + 1;
-    reorderByPopularity(ud.branchIndex);
+    /* header */
+    header { display:flex; gap:12px; align-items:center; justify-content:space-between; background: rgba(255,255,255,0.75); border-radius:var(--radius); padding:12px 14px; box-shadow:var(--shadow); backdrop-filter: blur(4px); }
+    .brand { display:flex; gap:12px; align-items:center; }
+    .logo { width:48px; height:48px; border-radius:10px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; box-shadow:0 8px 20px rgba(11,107,88,0.18); }
+    h1 { font-size:18px; margin:0; }
+    .sub { font-size:12px; color:var(--muted); margin-top:2px; }
+    .controls { display:flex; gap:10px; align-items:center; }
 
-    if(ud.type === 'leaf'){
-      if(item.internal){
-        // internal navigation
-        location.href = item.url;
+    /* search + filters */
+    .toolbar { display:flex; gap:12px; align-items:center; }
+    .search { display:flex; gap:8px; align-items:center; padding:8px 10px; border-radius:10px; background:#fff; border:1px solid rgba(0,0,0,0.04); box-shadow:0 6px 18px rgba(12,17,23,0.04); }
+    .search input { border:0; outline:none; font-size:14px; min-width:220px; }
+    .chip { padding:8px 10px; border-radius:999px; background:transparent; border:1px solid rgba(0,0,0,0.06); font-weight:600; cursor:pointer; }
+    .chip.active { background:var(--accent); color:#fff; border-color:transparent; }
+
+    /* layout */
+    main { display:grid; grid-template-columns: 1fr 320px; gap:var(--gap); align-items:start; }
+    @media (max-width:980px){ main{grid-template-columns:1fr;} .sidebar{order:2} }
+
+    /* bento grid */
+    .grid { background:transparent; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; }
+    .card {
+      background:var(--card); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow); transition:transform .16s ease, box-shadow .16s ease;
+      min-height:150px; border:1px solid rgba(0,0,0,0.03);
+    }
+    .card:focus-within, .card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(12,17,23,0.08); }
+
+    .media-row { display:flex; gap:10px; align-items:center; }
+    .thumb { width:68px; height:68px; border-radius:10px; flex-shrink:0; display:block; overflow:hidden; background:#f6fbf9; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px; }
+    .meta { display:flex; flex-direction:column; gap:4px; }
+    .title { margin:0; font-size:15px; font-weight:800; color:#0b2b2a; }
+    .desc { margin:0; color:var(--muted); font-size:13px; min-height:36px; }
+
+    .badge-row { display:flex; gap:8px; align-items:center; margin-top:auto; }
+    .btn { background:var(--accent); color:#fff; border:0; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; }
+    .btn.secondary { background:transparent; color:var(--accent); border:1px solid rgba(0,0,0,0.06); }
+
+    .badge { font-size:12px; padding:6px 8px; border-radius:999px; font-weight:700; }
+    .badge.hint { background:rgba(255,255,255,0.95); border:1px solid rgba(0,0,0,0.04); box-shadow:0 6px 18px rgba(12,17,23,0.03); }
+    .badge.leaf { background:var(--leaf); color:#0b6b58; }
+    .badge.fruit { background:var(--fruit); color:#b45309; }
+
+    /* tags */
+    .tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    .tag { font-size:12px; padding:6px 8px; border-radius:999px; background:rgba(0,0,0,0.04); cursor:pointer; }
+
+    /* sidebar */
+    .sidebar { display:flex; flex-direction:column; gap:12px; position:sticky; top:20px; align-self:start; }
+    .panel { background:var(--card); padding:12px; border-radius:10px; box-shadow:var(--shadow); border:1px solid rgba(0,0,0,0.03); }
+
+    /* small helpers */
+    .muted { color:var(--muted); font-size:13px; }
+    .result-count { font-weight:700; color:var(--accent); }
+    .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+
+    /* responsiveness & motion preference */
+    @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+    @media (max-width:700px){
+      .search input{ min-width: 120px; }
+      .thumb{ width:58px; height:58px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">BN</div>
+        <div>
+          <h1>Bento Showcase</h1>
+          <div class="sub">Showcase links with images, emoji hints, search & industry features</div>
+        </div>
+      </div>
+
+      <div class="controls" role="toolbar" aria-label="global controls">
+        <div class="toolbar">
+          <div class="search" role="search" aria-label="Search links">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#6c7a77" d="M21 21l-4.35-4.35"></path></svg>
+            <input id="searchInput" placeholder="Search title, tag, description..." aria-label="Search links" />
+          </div>
+          <button id="clearFilters" class="chip">Clear</button>
+        </div>
+        <button id="signin" class="chip">Sign in</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="catalog">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px;">
+          <div class="muted">Showing <span id="resultCount" class="result-count">0</span> results</div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <label for="sortSelect" class="muted">Sort</label>
+            <select id="sortSelect" style="padding:8px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06);">
+              <option value="popular">Most popular</option>
+              <option value="new">Newest</option>
+              <option value="alpha">A → Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="grid" class="grid" aria-live="polite"></div>
+      </section>
+
+      <aside class="sidebar" aria-label="Filters and tools">
+        <div class="panel">
+          <strong>Filters</strong>
+          <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+            <div>
+              <label class="muted" for="categorySelect">Category</label>
+              <select id="categorySelect" style="width:100%; padding:8px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); margin-top:6px;">
+                <option value="">All categories</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="muted" style="margin-bottom:6px;">Tags</div>
+              <div id="tagsWrap" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div>
+              <label class="muted">Type</label>
+              <div style="display:flex; gap:8px; margin-top:6px;">
+                <button id="filterAll" class="chip active">All</button>
+                <button id="filterLeaf" class="chip">Leaves</button>
+                <button id="filterFruit" class="chip">Fruits</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <strong>Bookmarks</strong>
+          <div style="margin-top:8px;">
+            <button id="exportBookmarks" class="btn secondary" style="width:100%;">Export (JSON)</button>
+            <button id="clearBookmarks" class="btn secondary" style="width:100%; margin-top:8px;">Clear</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <strong>Debug / Advanced</strong>
+          <div style="margin-top:8px;">
+            <button id="realtimeBtn" class="btn secondary" style="width:100%;">Enable Realtime (placeholder)</button>
+            <div class="muted" style="margin-top:8px; font-size:13px;">Data source: <code>/links.json</code> (fallback to inline sample)</div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer style="text-align:center; color:var(--muted); font-size:13px;">Built with modern patterns • Accessible • Progressive enhancement</footer>
+  </div>
+
+  <!-- Modal for preview -->
+  <div id="modal" role="dialog" aria-hidden="true" style="position:fixed; inset:0; display:none; background:rgba(0,0,0,0.45); align-items:center; justify-content:center; padding:20px;">
+    <div id="modalCard" style="background:#fff; border-radius:12px; padding:16px; width:min(720px,95%); box-shadow:0 24px 60px rgba(8,15,18,0.6);">
+      <button id="modalClose" style="float:right; border:none; background:transparent; font-size:18px; cursor:pointer;">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script type="module">
+  // ---------- Bento Showcase — JS (modern, modular, commented) ----------
+  // GPT-5 Thinking mini — professional single-file implementation
+  const DATA_URL = './links.json'; // drop links.json in same folder to override fallback
+  const STORAGE_POP = 'bento_popularity_v1';
+  const STORAGE_BOOK = 'bento_bookmarks_v1';
+
+  // Inline fallback sample data (used if fetch fails or file missing)
+  const SAMPLE = {
+    updatedAt: (new Date()).toISOString(),
+    links: [
+      {
+        id: 'l1', title: 'Laptop Deal — 20% OFF', url: 'https://example.com/laptop',
+        img: 'https://img.icons8.com/fluency/96/000000/laptop.png',
+        category: 'Electronics', tags: ['tech','hardware'], hintEmoji: '🎁', type: 'fruit', description: 'Limited-time laptop promotion — click to view the deal.'
+      },
+      {
+        id: 'l2', title: 'Camera Review: Top 5', url: 'https://example.com/camera-review',
+        img: 'https://img.icons8.com/fluency/96/000000/camera.png',
+        category: 'Electronics', tags: ['review','photography'], hintEmoji: '🤔', type: 'leaf', description: 'In-depth camera reviews to help you decide.'
+      },
+      {
+        id: 'l3', title: 'Cool T-Shirt', url: 'https://example.com/tshirt',
+        img: 'https://img.icons8.com/fluency/96/000000/t-shirt.png',
+        category: 'Clothing', tags: ['fashion'], hintEmoji: '👍', type: 'leaf', description: 'Comfortable graphic tee.'
+      },
+      {
+        id: 'l4', title: 'Summer Sale - Jackets', url: 'https://example.com/jackets',
+        img: 'https://img.icons8.com/fluency/96/000000/jacket.png',
+        category: 'Clothing', tags: ['sale','seasonal'], hintEmoji: '🎁', type: 'fruit', description: 'Seasonal jackets sale — limited stock.'
+      },
+      {
+        id: 'l5', title: 'Travel Guide: Bali', url: 'https://example.com/bali',
+        img: 'https://img.icons8.com/fluency/96/000000/beach.png',
+        category: 'Travel', tags: ['travel','guide'], hintEmoji: '🤩', type: 'leaf', description: 'Top tips and an itinerary for Bali.'
+      },
+      {
+        id: 'l6', title: 'Productivity Tools', url: 'https://example.com/tools',
+        img: 'https://img.icons8.com/fluency/96/000000/productivity.png',
+        category: 'Utilities', tags: ['software','tools'], hintEmoji: '🤔', type: 'leaf', description: 'Collection of productivity web apps.'
+      },
+      {
+        id: 'l7', title: 'Weekly Deals', url: 'https://example.com/deals',
+        img: 'https://img.icons8.com/fluency/96/000000/discount.png',
+        category: 'Promotions', tags: ['deals','promo'], hintEmoji: '🎁', type: 'fruit', description: 'Curated weekly deals.'
+      },
+      {
+        id: 'l8', title: 'UX Portfolio', url: 'https://example.com/portfolio',
+        img: 'https://img.icons8.com/fluency/96/000000/portfolio.png',
+        category: 'Design', tags: ['portfolio','ux'], hintEmoji: '🤔', type: 'leaf', description: 'A showcase of UX projects.' }
+    ]
+  };
+
+  // ---- helpers ----
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const debounce = (fn, wait=220) => { let t; return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), wait); }; };
+
+  // Safe open external
+  function safeOpen(url){
+    try {
+      const u = new URL(url, location.href);
+      // prevent javascript: etc
+      if(u.protocol === 'http:' || u.protocol === 'https:') {
+        window.open(u.href, '_blank', 'noopener,noreferrer');
       } else {
-        window.open(item.url, '_blank');
+        console.warn('Blocked non-http url:', url);
       }
-    } else if(ud.type === 'fruit'){
-      window.open(item.url, '_blank');
+    } catch(e){
+      console.warn('Invalid url', url);
     }
   }
 
-  // ---------- Popularity reorder ----------
-  function reorderByPopularity(branchIndex){
-    const br = BRANCHES[branchIndex];
-    if(!br) return;
-    const bData = br.bData;
+  // Local persistence
+  function readJSON(key, fallback={}) {
+    try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch(e){ return fallback; }
+  }
+  function writeJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
 
-    // sort leaves and fruits by clicks ascending so popular ones move to the end
-    bData.leaves.sort((a,b)=> (a.clicks||0) - (b.clicks||0) );
-    bData.fruits.sort((a,b)=> (a.clicks||0) - (b.clicks||0) );
+  // Popularity & bookmarks
+  const popularity = readJSON(STORAGE_POP, {});
+  const bookmarks = readJSON(STORAGE_BOOK, {});
 
-    // reposition
-    br.leafObjects.forEach(o=>scene.remove(o));
-    br.leafObjects.length = 0;
-    br.fruitObjects.forEach(o=>scene.remove(o));
-    br.fruitObjects.length = 0;
+  // UI elements
+  const grid = $('#grid');
+  const resultCount = $('#resultCount');
+  const searchInput = $('#searchInput');
+  const categorySelect = $('#categorySelect');
+  const tagsWrap = $('#tagsWrap');
+  const sortSelect = $('#sortSelect');
 
-    // recreate items for this branch only (keeps other branches intact)
-    const curve = br.curve;
-    // leaves
-    bData.leaves.forEach((leaf,i)=>{
-      const t = 0.35 + (i / Math.max(1, bData.leaves.length)) * 0.45;
-      const pos = curve.getPoint(t);
-      const tangent = curve.getTangent(t).normalize();
-      const normal = new THREE.Vector3().crossVectors(tangent, new THREE.Vector3(0,1,0)).normalize();
-      const offset = normal.clone().multiplyScalar(0.6 + 0.08 * (i % 2));
-      const finalPos = pos.clone().add(offset).add(new THREE.Vector3(0, -0.02 * i, 0));
-      const sprite = makeLeafSprite(leaf.label);
-      sprite.position.copy(finalPos);
-      sprite.userData = { type:'leaf', data: leaf, branchIndex, t, basePos: finalPos.clone() };
-      sprite.scale.set(0.8,0.8,0.8);
-      scene.add(sprite);
-      pickable.push(sprite);
-      br.leafObjects.push(sprite);
+  // Modal
+  const modal = $('#modal');
+  const modalContent = $('#modalContent');
+  const modalClose = $('#modalClose');
+
+  modalClose.addEventListener('click', () => { modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); modalContent.innerHTML = ''; });
+
+  // load data (try links.json else fallback)
+  async function loadData(){
+    try {
+      const res = await fetch(DATA_URL, {cache:'no-store'});
+      if(!res.ok) throw new Error('no links.json');
+      const json = await res.json();
+      if(!json.links || !Array.isArray(json.links)) throw new Error('invalid format');
+      return json.links;
+    } catch(e){
+      console.warn('Using fallback SAMPLE data — to use your own, add links.json in same folder.', e);
+      return SAMPLE.links;
+    }
+  }
+
+  // Build unique categories and tags
+  function extractFacets(items){
+    const cats = new Set();
+    const tags = new Set();
+    items.forEach(i => { if(i.category) cats.add(i.category); (i.tags||[]).forEach(t=>tags.add(t)); });
+    return { cats: Array.from(cats).sort(), tags: Array.from(tags).sort() };
+  }
+
+  // Render functions
+  function renderGrid(items, options = {}) {
+    grid.innerHTML = '';
+    resultCount.textContent = items.length;
+    if(items.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1; padding:28px; text-align:center; color:var(--muted)">No results — try different filters</div>`;
+      return;
+    }
+
+    // use DocumentFragment for perf
+    const frag = document.createDocumentFragment();
+    items.forEach(it => {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.tabIndex = 0;
+      card.setAttribute('data-id', it.id);
+      // media row
+      const media = document.createElement('div');
+      media.className = 'media-row';
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+      // image with lazy loading & fallback
+      const img = document.createElement('img');
+      img.alt = it.title;
+      img.loading = 'lazy';
+      img.style.width = '100%'; img.style.height='100%'; img.style.objectFit='cover';
+      img.src = it.img || '';
+      img.onerror = () => {
+        // simple SVG data URI fallback
+        img.src = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><rect width='100%' height='100%' fill='#f3fbf9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='18' fill='#9aa'>${(it.title||'Link').slice(0,10)}</text></svg>`)}`;
+      };
+      thumb.appendChild(img);
+
+      const meta = document.createElement('div'); meta.className = 'meta';
+      const title = document.createElement('h3'); title.className = 'title'; title.textContent = it.title;
+      const desc = document.createElement('p'); desc.className = 'desc'; desc.textContent = it.description || '';
+      meta.appendChild(title); meta.appendChild(desc);
+      media.appendChild(thumb); media.appendChild(meta);
+
+      // tag row
+      const tagsRow = document.createElement('div'); tagsRow.className = 'tags';
+      (it.tags||[]).forEach(t=>{
+        const tEl = document.createElement('span'); tEl.className='tag'; tEl.textContent = t;
+        tEl.title = `Filter by ${t}`;
+        tEl.addEventListener('click', ()=> { toggleTagFilter(t); });
+        tagsRow.appendChild(tEl);
+      });
+
+      // badges & actions
+      const badgeRow = document.createElement('div'); badgeRow.className='badge-row';
+      const hint = document.createElement('span'); hint.className='badge hint'; hint.textContent = it.hintEmoji || '🤔'; hint.title = 'Hint';
+      const typeBadge = document.createElement('span'); typeBadge.className = `badge ${it.type==='fruit' ? 'fruit' : 'leaf'}`; typeBadge.textContent = it.type==='fruit' ? 'Fruit' : 'Leaf';
+
+      // action buttons: preview, open, bookmark
+      const openBtn = document.createElement('button'); openBtn.className='btn'; openBtn.textContent = 'Open';
+      openBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        // update popularity
+        popularity[it.id] = (popularity[it.id] || 0) + 1;
+        writeJSON(STORAGE_POP, popularity);
+        if(it.type === 'fruit') safeOpen(it.url); else location.href = it.url;
+        // subtle animation
+        card.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:240});
+        // reapply sorting if needed (optionally)
+      });
+
+      const previewBtn = document.createElement('button'); previewBtn.className='btn secondary'; previewBtn.textContent='Preview';
+      previewBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showModal(it);
+      });
+
+      const bmBtn = document.createElement('button'); bmBtn.className='chip'; bmBtn.textContent = bookmarks[it.id] ? 'Bookmarked' : 'Bookmark';
+      bmBtn.title = bookmarks[it.id] ? 'Remove bookmark' : 'Save bookmark';
+      bmBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        if(bookmarks[it.id]) { delete bookmarks[it.id]; bmBtn.textContent='Bookmark'; }
+        else { bookmarks[it.id] = Date.now(); bmBtn.textContent='Bookmarked'; }
+        writeJSON(STORAGE_BOOK, bookmarks);
+      });
+
+      badgeRow.append(hint, typeBadge, bmBtn, previewBtn, openBtn);
+
+      // Put together
+      card.appendChild(media);
+      if((it.tags||[]).length) card.appendChild(tagsRow);
+      card.appendChild(badgeRow);
+
+      // keyboard: Enter opens preview
+      card.addEventListener('keydown', (ev)=> { if(ev.key==='Enter') showModal(it); });
+
+      // click card opens preview as primary
+      card.addEventListener('click', ()=> showModal(it));
+
+      frag.appendChild(card);
     });
-    // fruits
-    bData.fruits.forEach((fruit,i)=>{
-      const t = 0.45 + (i / Math.max(1, bData.fruits.length)) * 0.38;
-      const pos = curve.getPoint(t);
-      const hang = new THREE.Vector3(0, -0.35 - 0.08*i, 0);
-      const finalPos = pos.clone().add(hang);
-      const geom = new THREE.SphereGeometry(0.18, 16, 12);
-      const matF = new THREE.MeshStandardMaterial({ color: 0xff5a5a, roughness:0.6 });
-      const meshF = new THREE.Mesh(geom, matF);
-      meshF.position.copy(finalPos);
-      meshF.userData = { type: 'fruit', data: fruit, branchIndex, t, basePos: finalPos.clone() };
-      scene.add(meshF);
-      pickable.push(meshF);
-      br.fruitObjects.push(meshF);
+
+    grid.appendChild(frag);
+  }
+
+  // Modal preview
+  function showModal(it){
+    modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false');
+    modalContent.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:160px;height:160px;flex-shrink:0;border-radius:12px;overflow:hidden;background:#f6fbf9">
+          <img src="${it.img||''}" alt="${it.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'160\\' height=\\'160\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'#f3fbf9\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'16\\' fill=\\'#9aa\\'>${(it.title||'').slice(0,12)}</text></svg>`) }' />
+        </div>
+        <div style="flex:1">
+          <h2 style="margin:0 0 8px 0">${it.title}</h2>
+          <p style="color:var(--muted);margin:0 0 12px 0">${it.description || ''}</p>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:10px;">
+            <button id="modalOpen" class="btn">Open Link</button>
+            <button id="modalBookmark" class="btn secondary">${bookmarks[it.id] ? 'Bookmarked' : 'Bookmark'}</button>
+          </div>
+        </div>
+      </div>
+    `;
+    $('#modalOpen').addEventListener('click', ()=> {
+      popularity[it.id] = (popularity[it.id] || 0) + 1;
+      writeJSON(STORAGE_POP, popularity);
+      if(it.type === 'fruit') safeOpen(it.url); else location.href = it.url;
+    });
+    $('#modalBookmark').addEventListener('click', ()=>{
+      if(bookmarks[it.id]) { delete bookmarks[it.id]; $('#modalBookmark').textContent = 'Bookmark'; }
+      else { bookmarks[it.id] = Date.now(); $('#modalBookmark').textContent = 'Bookmarked'; }
+      writeJSON(STORAGE_BOOK, bookmarks);
     });
   }
 
-  // ---------- Simple animation loop: sway & hover effects ----------
-  let clock = new THREE.Clock();
-  let swayEnabled = true;
+  // Filtering / search / sorting pipeline
+  let ALL_LINKS = [];
+  let activeTagFilters = new Set();
+  let activeTypeFilter = ''; // '', 'leaf', 'fruit'
+  let activeCategory = '';
 
-  function animate(){
-    requestAnimationFrame(animate);
-    const t = clock.getElapsedTime();
-
-    // gentle sway: perturb branch control points slightly and update tube geometries
-    if(swayEnabled){
-      BRANCHES.forEach((br, bi)=>{
-        const curve = br.curve;
-        // adjust control points for a subtle organic motion
-        // Original curve points are stored implicitly; we'll nudge mesh rotation instead for perf
-        const sway = Math.sin(t * 0.7 + bi * 0.6) * 0.06;
-        br.mesh.rotation.z = sway * (br.angle>0?1:-1);
-      });
-    }
-
-    // hover detection
-    raycaster.setFromCamera(pointer, camera);
-    const intersects = raycaster.intersectObjects(pickable, true);
-
-    // reset hover for all
-    pickable.forEach(obj=>{ if(obj.userData) obj.userData.hover = false; if(obj.material && obj.material.emissive) obj.material.emissive.setHex(0x000000); if(obj.scale){ obj.scale.lerp(new THREE.Vector3(1,1,1), 0.08); }});
-
-    if(intersects.length){
-      const o = intersects[0].object;
-      o.userData.hover = true;
-      // scale up
-      if(o.scale) o.scale.lerp(new THREE.Vector3(1.18,1.18,1.18), 0.16);
-      // add subtle emissive for fruits
-      if(o.material && o.material.emissive) o.material.emissive.setHex(0x222222);
-    }
-
-    // small per-item swaying motion for leaves and fruits
-    BRANCHES.forEach((br, bi)=>{
-      (br.leafObjects||[]).forEach((spr, i)=>{
-        const u = (t + i*0.6 + bi*0.4);
-        const sway = Math.sin(u) * 0.03;
-        const base = spr.userData.basePos;
-        spr.position.x = base.x + sway;
-        spr.position.y = base.y + Math.sin(u*1.3)*0.01;
-      });
-      (br.fruitObjects||[]).forEach((f, i)=>{
-        const u = (t + i*0.4 + bi*0.9);
-        const sway = Math.sin(u) * 0.02;
-        const base = f.userData.basePos;
-        f.position.x = base.x + sway;
-        f.position.y = base.y + Math.sin(u*1.4)*0.01;
-      });
-    });
-
-    TWEEN.update();
-    controls.update();
-    renderer.render(scene, camera);
+  function toggleTagFilter(tag){
+    if(activeTagFilters.has(tag)) activeTagFilters.delete(tag);
+    else activeTagFilters.add(tag);
+    applyFilters();
   }
 
-  // ---------- Minimal tween implementation via included tween.js fallback ----------
-  // We'll add a tiny inline TWEEN for the pulse effect (keeps dependencies low)
-  // If Tween library not present, we ship a very small one.
-  window.TWEEN = window.TWEEN || (function(){
-    const tweens = [];
-    function Tween(obj){ this.obj = obj; this._to = {}; this._dur=300; this._onUpdate=null; this._onComplete=null; this._easing=(t)=>t; }
-    Tween.prototype.to = function(to, dur){ this._to=to; if(dur) this._dur=dur; return this; };
-    Tween.prototype.easing = function(fn){ this._easing=fn; return this; };
-    Tween.prototype.onUpdate = function(fn){ this._onUpdate=fn; return this; };
-    Tween.prototype.onComplete = function(fn){ this._onComplete=fn; return this; };
-    Tween.prototype.start = function(){ this._start=Date.now(); this._from={}; for(const k in this._to) this._from[k]=this.obj[k]; tweens.push(this); return this; };
-    Tween.prototype.yoyo = function(){ this._yoyo=true; return this; };
-    Tween.prototype.repeat = function(c){ this._repeat=c; return this; };
-    function update(){ const now=Date.now(); for(let i=tweens.length-1;i>=0;i--){ const tw=tweens[i]; const p=Math.min(1,(now-tw._start)/tw._dur); const e=tw._easing(p); for(const k in tw._to) tw.obj[k]=tw._from[k] + (tw._to[k]-tw._from[k]) * e; if(tw._onUpdate) tw._onUpdate(tw.obj); if(p>=1){ if(tw._yoyo){ const tmp=tw._from; tw._from=tw._to; tw._to=tmp; tw._start=Date.now(); tw._yoyo=false; tw._repeat = (tw._repeat||0)-1; if(tw._repeat>0) continue; } if(tw._onComplete) tw._onComplete(); tweens.splice(i,1); } }
+  function applyFilters(){
+    const q = (searchInput.value || '').trim().toLowerCase();
+    const sort = sortSelect.value;
+    let results = ALL_LINKS.slice();
+
+    if(activeCategory) results = results.filter(r => r.category === activeCategory);
+    if(activeTypeFilter) results = results.filter(r => r.type === activeTypeFilter);
+    if(activeTagFilters.size) results = results.filter(r => (r.tags||[]).some(t => activeTagFilters.has(t)));
+    if(q) {
+      results = results.filter(r => (r.title + ' ' + (r.description||'') + ' ' + (r.tags||[]).join(' ')).toLowerCase().includes(q));
     }
-    return { Tween:Tween, update:function(){ update(); }, Easing:{ Quadratic:{ Out:function(t){ return 1 - (1 - t) * (1 - t); } } } , add:function(t){/*noop*/} };
+
+    // sorting
+    if(sort === 'popular') {
+      results.sort((a,b) => (popularity[b.id]||0) - (popularity[a.id]||0));
+    } else if(sort === 'new') {
+      results.sort((a,b) => (b._added || 0) - (a._added || 0));
+    } else if(sort === 'alpha'){
+      results.sort((a,b)=> a.title.localeCompare(b.title));
+    }
+
+    renderGrid(results);
+    renderFacets(ALL_LINKS);
+  }
+
+  // facets UI
+  function renderFacets(all){
+    const {cats, tags} = extractFacets(all);
+    // categories
+    categorySelect.innerHTML = `<option value="">All categories</option>` + cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    categorySelect.value = activeCategory;
+    // tags
+    tagsWrap.innerHTML = '';
+    tags.forEach(t=>{
+      const el = document.createElement('button'); el.className='chip'; el.textContent = t;
+      if(activeTagFilters.has(t)) el.classList.add('active');
+      el.addEventListener('click', ()=> { toggleTagFilter(t); el.classList.toggle('active'); });
+      tagsWrap.appendChild(el);
+    });
+  }
+
+  // utility: extract facets
+  function extractFacets(items){
+    const cats = new Set(); const tags = new Set();
+    items.forEach(i => { if(i.category) cats.add(i.category); (i.tags||[]).forEach(t=>tags.add(t)); });
+    return {cats: Array.from(cats).sort(), tags: Array.from(tags).sort()};
+  }
+
+  // init app
+  (async function init(){
+    ALL_LINKS = await loadData();
+    // tag internal timestamp for "new" sorting
+    ALL_LINKS.forEach((l,i)=> l._added = l._added || Date.now() - (i * 1000));
+
+    renderFacets(ALL_LINKS);
+    applyFilters();
+
+    // wire UI
+    searchInput.addEventListener('input', debounce(()=>applyFilters(), 180));
+    $('#clearFilters').addEventListener('click', ()=> {
+      searchInput.value=''; activeTagFilters.clear(); activeTypeFilter=''; activeCategory=''; $('#filterAll').classList.add('active'); $('#filterLeaf').classList.remove('active'); $('#filterFruit').classList.remove('active');
+      applyFilters();
+    });
+    $('#filterAll').addEventListener('click', ()=>{ activeTypeFilter=''; $('#filterAll').classList.add('active'); $('#filterLeaf').classList.remove('active'); $('#filterFruit').classList.remove('active'); applyFilters(); });
+    $('#filterLeaf').addEventListener('click', ()=>{ activeTypeFilter='leaf'; $('#filterAll').classList.remove('active'); $('#filterLeaf').classList.add('active'); $('#filterFruit').classList.remove('active'); applyFilters(); });
+    $('#filterFruit').addEventListener('click', ()=>{ activeTypeFilter='fruit'; $('#filterAll').classList.remove('active'); $('#filterLeaf').classList.remove('active'); $('#filterFruit').classList.add('active'); applyFilters(); });
+    categorySelect.addEventListener('change', ()=> { activeCategory = categorySelect.value; applyFilters(); });
+    sortSelect.addEventListener('change', applyFilters);
+
+    // bookmarks export/clear
+    $('#exportBookmarks').addEventListener('click', ()=>{
+      const payload = JSON.stringify(bookmarks, null, 2);
+      const blob = new Blob([payload], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'bookmarks.json'; a.click(); URL.revokeObjectURL(url);
+    });
+    $('#clearBookmarks').addEventListener('click', ()=> { localStorage.removeItem(STORAGE_BOOK); Object.keys(bookmarks).forEach(k=>delete bookmarks[k]); alert('Bookmarks cleared'); });
+
+    // realtime placeholder
+    $('#realtimeBtn').addEventListener('click', ()=> alert('Realtime placeholder — integrate Ably / WebSockets to push updates.'));
+
+    // sign in placeholder
+    $('#signin').addEventListener('click', ()=> alert('Auth placeholder — integrate Magic.link or other provider here.'));
+
+    // accessibility: Escape closes modal
+    document.addEventListener('keydown', (e)=> { if(e.key === 'Escape'){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); } });
+
   })();
-  const TWEEN = window.TWEEN;
 
-  // ---------- Event handlers for UI ----------
-  document.getElementById('toggle-sway').addEventListener('click', ()=>{ swayEnabled = !swayEnabled; document.getElementById('toggle-sway').textContent = swayEnabled? 'Disable sway':'Enable sway'; });
-  document.getElementById('reseed').addEventListener('click', ()=>{ // simple shuffle of items
-    TREE_DATA.branches.forEach(b=>{ b.leaves.sort(()=>Math.random()-0.5); b.fruits.sort(()=>Math.random()-0.5); });
-    buildTree();
-  });
+  // Expose small helper for debugging in console (optional)
+  window.bento = { reload: async ()=>{ ALL_LINKS = await loadData(); applyFilters(); }, get state(){return {popularity: readJSON(STORAGE_POP,{}), bookmarks: readJSON(STORAGE_BOOK,{})}} };
 
-  // ---------- handle resize ----------
-  window.addEventListener('resize', ()=>{ camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
-
-  // ---------- wire up initial build & animate ----------
-  buildTree();
-  animate();
-
-  // ---------- small utility: cleanup on unload ----------
-  window.addEventListener('beforeunload', ()=>{ renderer.dispose(); });
-
-  // ---------- END MODULE ----------
-  </script></body>
-</html>
+  </script>
+</body>
+              </html>

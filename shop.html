@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farm Rise — Shop</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { background:#050510; color:#f1f5f9; font-family:'Inter', sans-serif; margin:0; padding:2rem; }
+  .grid { display:grid; gap:1.5rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: rgba(15,15,25,0.85); backdrop-filter: blur(8px); border:1px solid #00f6ff; border-radius:1rem; padding:1rem; text-align:center; transition: all 0.3s; }
+  .card:hover { transform: translateY(-4px) scale(1.02); border-color:#ff007a; }
+  .card img { width:100%; border-radius:0.75rem; margin-bottom:0.75rem; object-fit:cover; height:150px; }
+  .card a { display:inline-block; margin-top:0.5rem; padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid #00f6ff; color:#00f6ff; transition:0.3s; text-decoration:none; font-weight:500; }
+  .card a:hover { background:#00f6ff; color:#000; }
+  footer { text-align:center; margin-top:3rem; font-size:0.85rem; color:#94a3b8; }
+</style>
+</head>
+<body>
+
+<h1 class="text-3xl mb-6 text-center font-bold text-[#00f6ff]">Farm Rise — Shop</h1>
+
+<section class="grid" id="productGrid"></section>
+
+<footer>&copy; <span id="year"></span> Farm Rise</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+fetch('products.json')
+  .then(res => res.json())
+  .then(products => {
+    const grid = document.getElementById('productGrid');
+    products.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <img src="${p.img}" alt="${p.name}">
+        <h3>${p.name}</h3>
+        <span>₦${p.price}</span>
+        <a href="${p.url}" target="_blank">Buy Now</a>
+      `;
+      grid.appendChild(card);
+    });
+  })
+  .catch(err => console.error(err));
+</script>
+
+</body>
+</html>

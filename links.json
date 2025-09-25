@@ -1,20 +1,17 @@
 [
   {
-    "title": "Organic Farm Dashboard",
-    "img": "https://via.placeholder.com/400x250",
-    "short_desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    "slug": "organic-farm-dashboard"
+    "title": "How to Grow Organic Vegetables",
+    "url": "https://yourblog.com/post1",
+    "img": "https://via.placeholder.com/400x250"
   },
   {
-    "title": "Marketplace App",
-    "img": "https://via.placeholder.com/400x250",
-    "short_desc": "Curabitur non nulla sit amet nisl tempus convallis quis ac lectus.",
-    "slug": "marketplace-app"
+    "title": "5 Tips for Community Gardening",
+    "url": "https://yourblog.com/post2",
+    "img": "https://via.placeholder.com/400x250"
   },
   {
-    "title": "Community Garden Project",
-    "img": "https://via.placeholder.com/400x250",
-    "short_desc": "Praesent sapien massa, convallis a pellentesque nec, egestas non nisi.",
-    "slug": "community-garden-project"
+    "title": "Innovative Farming Tools",
+    "url": "https://yourblog.com/post3",
+    "img": "https://via.placeholder.com/400x250"
   }
 ]

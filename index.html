@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Rise — Dynamic Project Showcase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .card {
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    .glass {
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 font-inter">
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-r from-green-400 to-blue-500 text-white h-screen flex flex-col justify-center items-center text-center px-6">
+    <h1 class="text-5xl font-bold mb-4">Farm Rise</h1>
+    <p class="text-lg mb-6 max-w-2xl">Dynamic, interactive, and visually appealing project showcase for your business or portfolio. Easy to update and fully responsive.</p>
+    <a href="#projects" class="bg-white text-green-500 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition">View Projects</a>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="py-20 max-w-7xl mx-auto px-6">
+    <h2 class="text-4xl font-bold text-green-500 text-center mb-16">Featured Projects</h2>
+    <div id="projectGrid" class="grid md:grid-cols-3 sm:grid-cols-2 gap-10"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-200 py-8 text-center text-gray-600">
+    <p>© <span id="year"></span> Farm Rise — All Rights Reserved</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Sample JSON data (replace with links.json for live usage)
+    const projects = [
+      { "title": "Organic Farm Dashboard", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
+      { "title": "Marketplace App", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
+      { "title": "Agro Products Website", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
+      { "title": "Farm Management Tool", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
+      { "title": "E-commerce Storefront", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
+      { "title": "Community Garden Portal", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" }
+    ];
+
+    const grid = document.getElementById('projectGrid');
+    projects.forEach(project => {
+      const card = document.createElement('a');
+      card.href = project.url;
+      card.target = "_blank";
+      card.className = "card glass p-4 rounded-xl shadow flex flex-col items-center text-center hover:bg-white transition";
+      card.innerHTML = `
+        <img src="${project.img}" alt="${project.title}" class="mb-4 rounded-lg w-full h-48 object-cover">
+        <h3 class="font-semibold text-xl text-green-600 mb-2">${project.title}</h3>
+        <p class="text-gray-200 text-sm">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      `;
+      grid.appendChild(card);
+    });
+  </script>
+
+</body>
+</html>

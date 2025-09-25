@@ -1,12 +1,10 @@
 [
-  { 
-    "title": "Farm Arise — Stevia", 
-    "url": "https://farm-arise-stevia.vercel.app", 
-    "img": "https://via.placeholder.com/300x200?text=Stevia" 
+  {
+    "title": "Stevia Project",
+    "url": "https://farm-arise-stevia.vercel.app"
   },
-  { 
-    "title": "Farm Arise — Cauliflower", 
-    "url": "https://farm-arise-cauliflower.vercel.app", 
-    "img": "https://via.placeholder.com/300x200?text=Cauliflower" 
+  {
+    "title": "Cauliflower Project",
+    "url": "https://farm-arise-cauliflower.vercel.app"
   }
 ]

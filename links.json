@@ -1,17 +1,4 @@
 [
-  {
-    "title": "How to Grow Organic Vegetables",
-    "url": "https://yourblog.com/post1",
-    "img": "https://via.placeholder.com/400x250"
-  },
-  {
-    "title": "5 Tips for Community Gardening",
-    "url": "https://yourblog.com/post2",
-    "img": "https://via.placeholder.com/400x250"
-  },
-  {
-    "title": "Innovative Farming Tools",
-    "url": "https://yourblog.com/post3",
-    "img": "https://via.placeholder.com/400x250"
-  }
+  { "title": "How to Grow Tomatoes", "url": "post.html?id=0", "img": "https://via.placeholder.com/300x200" },
+  { "title": "Sustainable Farming Tips", "url": "post.html?id=1", "img": "https://via.placeholder.com/300x200" }
 ]

@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Organic Stevia Pack",
+    "url": "https://farm-arise-stevia.vercel.app",
+    "price": "₦5,000",
+    "img": "https://via.placeholder.com/300x150?text=Stevia"
+  },
+  {
+    "title": "Fresh Cauliflower",
+    "url": "https://farm-arise-cauliflower.vercel.app",
+    "price": "₦3,500",
+    "img": "https://via.placeholder.com/300x150?text=Cauliflower"
+  }
+]

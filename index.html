@@ -1,73 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farm Rise — Dynamic Project Showcase</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FarmRise — Projects & Innovations</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    .card {
-      transition: all 0.3s ease;
-    }
-    .card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-    }
-    .glass {
-      backdrop-filter: blur(10px);
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
+    body { font-family: 'Inter', sans-serif; background:#050510; color:#f1f5f9; }
+    .hero { background: linear-gradient(135deg, #0d6efd, #10b981); clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%); padding:6rem 2rem; text-align:center; }
+    .hero h1 { font-size:3rem; font-weight:700; color:#fff; margin-bottom:1rem; }
+    .hero p { font-size:1.2rem; color:#e0f2fe; margin-bottom:2rem; }
+    .card { background: rgba(15,15,25,0.85); backdrop-filter: blur(8px); border:1px solid #00f6ff; border-radius:1rem; padding:1.5rem; transition: all 0.3s; }
+    .card:hover { transform: translateY(-5px) scale(1.03); border-color:#ff007a; }
+    .card img { width:100%; border-radius:0.75rem; margin-bottom:1rem; }
+    .card h3 { color:#00f6ff; font-weight:600; margin-bottom:0.5rem; }
+    .card p { color:#cbd5e1; font-size:0.95rem; }
+    footer { text-align:center; margin:4rem 0 2rem; font-size:0.85rem; color:#94a3b8; }
   </style>
 </head>
-<body class="bg-gray-100 font-inter">
+<body>
 
   <!-- HERO -->
-  <section class="bg-gradient-to-r from-green-400 to-blue-500 text-white h-screen flex flex-col justify-center items-center text-center px-6">
-    <h1 class="text-5xl font-bold mb-4">Farm Rise</h1>
-    <p class="text-lg mb-6 max-w-2xl">Dynamic, interactive, and visually appealing project showcase for your business or portfolio. Easy to update and fully responsive.</p>
-    <a href="#projects" class="bg-white text-green-500 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition">View Projects</a>
+  <section class="hero">
+    <h1>FarmRise — Empowering Local Innovation</h1>
+    <p>Explore our curated projects, products, and community initiatives. All dynamically loaded and fully responsive.</p>
   </section>
 
-  <!-- PROJECTS -->
-  <section id="projects" class="py-20 max-w-7xl mx-auto px-6">
-    <h2 class="text-4xl font-bold text-green-500 text-center mb-16">Featured Projects</h2>
-    <div id="projectGrid" class="grid md:grid-cols-3 sm:grid-cols-2 gap-10"></div>
+  <!-- PROJECT GRID -->
+  <section class="projects max-w-6xl mx-auto px-4 py-16">
+    <h2 class="text-3xl text-center mb-12 font-bold text-cyan-400">Featured Projects</h2>
+    <div id="projectGrid" class="grid md:grid-cols-3 sm:grid-cols-2 gap-8"></div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="bg-gray-200 py-8 text-center text-gray-600">
-    <p>© <span id="year"></span> Farm Rise — All Rights Reserved</p>
+  <footer>
+    &copy; <span id="year"></span> FarmRise. All Rights Reserved.
   </footer>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Sample JSON data (replace with links.json for live usage)
-    const projects = [
-      { "title": "Organic Farm Dashboard", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
-      { "title": "Marketplace App", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
-      { "title": "Agro Products Website", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
-      { "title": "Farm Management Tool", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
-      { "title": "E-commerce Storefront", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" },
-      { "title": "Community Garden Portal", "img":"https://via.placeholder.com/400x250", "url":"https://example.com" }
-    ];
-
-    const grid = document.getElementById('projectGrid');
-    projects.forEach(project => {
-      const card = document.createElement('a');
-      card.href = project.url;
-      card.target = "_blank";
-      card.className = "card glass p-4 rounded-xl shadow flex flex-col items-center text-center hover:bg-white transition";
-      card.innerHTML = `
-        <img src="${project.img}" alt="${project.title}" class="mb-4 rounded-lg w-full h-48 object-cover">
-        <h3 class="font-semibold text-xl text-green-600 mb-2">${project.title}</h3>
-        <p class="text-gray-200 text-sm">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-      `;
-      grid.appendChild(card);
-    });
+    // Fetch JSON projects
+    fetch('links.json')
+      .then(res => res.json())
+      .then(projects => {
+        const grid = document.getElementById('projectGrid');
+        projects.forEach(p => {
+          const card = document.createElement('a');
+          card.href = `post.html?project=${p.slug}`;
+          card.className = "card flex flex-col items-center text-center";
+          card.innerHTML = `
+            <img src="${p.img}" alt="${p.title}">
+            <h3>${p.title}</h3>
+            <p>${p.short_desc}</p>
+          `;
+          grid.appendChild(card);
+        });
+      });
   </script>
-
 </body>
 </html>

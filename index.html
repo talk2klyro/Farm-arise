@@ -3,83 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Farm Rise — Tier 2 Showcase</title>
+<title>Farm Rise — Portal</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { background:#050510; color:#f1f5f9; font-family:'Inter', sans-serif; margin:0; padding:2rem; }
+  .tabs { display:flex; justify-center; gap:2rem; margin-bottom:2rem; }
+  .tab { cursor:pointer; padding:0.5rem 1.5rem; border-radius:0.5rem; border:1px solid #00f6ff; transition:0.3s; font-weight:600; }
+  .tab.active { background:#00f6ff; color:#000; }
   .grid { display:grid; gap:1.5rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   .card { background: rgba(15,15,25,0.85); backdrop-filter: blur(8px); border:1px solid #00f6ff; border-radius:1rem; padding:1rem; text-align:center; transition: all 0.3s; }
   .card:hover { transform: translateY(-4px) scale(1.02); border-color:#ff007a; }
   .card img { width:100%; border-radius:0.75rem; margin-bottom:0.75rem; object-fit:cover; height:150px; }
-  .card a { display:inline-block; margin-top:0.5rem; padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid #00f6ff; color:#00f6ff; transition:0.3s; text-decoration:none; font-weight:500; }
-  .card a:hover { background:#00f6ff; color:#000; }
-  
-  /* Snackbar */
-  #snackbar {
-    visibility: hidden;
-    min-width: 220px;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 8px;
-    padding: 1rem;
-    position: fixed;
-    z-index: 999;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
-    font-size: 0.9rem;
-  }
-  #snackbar.show {
-    visibility: visible;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
-  }
-  @keyframes fadein { from {bottom:0; opacity:0;} to {bottom:30px; opacity:1;} }
-  @keyframes fadeout { from {bottom:30px; opacity:1;} to {bottom:0; opacity:0;} }
-
+  .card h3 { margin-bottom:0.5rem; font-weight:600; color:#00f6ff; }
+  .price { color:#ff007a; font-weight:600; margin-bottom:0.5rem; }
+  .btn { display:inline-block; margin:0.25rem; padding:0.4rem 0.8rem; border-radius:0.5rem; border:1px solid #00f6ff; color:#00f6ff; text-decoration:none; font-size:0.875rem; transition:0.3s; }
+  .btn:hover { background:#00f6ff; color:#000; }
   footer { text-align:center; margin-top:3rem; font-size:0.85rem; color:#94a3b8; }
 </style>
 </head>
 <body>
 
-<section class="grid" id="projectGrid">
-  <!-- Dynamic cards will be injected here -->
-</section>
+<h1 class="text-3xl mb-6 text-center font-bold text-[#00f6ff]">Farm Rise Portal</h1>
 
-<!-- Snackbar -->
-<div id="snackbar"></div>
+<div class="tabs">
+  <div class="tab active" id="postsTab">Posts</div>
+  <div class="tab" id="shopTab">Shop</div>
+</div>
+
+<section class="grid" id="contentGrid"></section>
 
 <footer>&copy; <span id="year"></span> Farm Rise</footer>
 
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Show snackbar function
-function showSnackbar(msg) {
-  const snackbar = document.getElementById('snackbar');
-  snackbar.textContent = msg;
-  snackbar.className = "show";
-  setTimeout(() => { snackbar.className = snackbar.className.replace("show", ""); }, 3000);
+let currentTab = 'posts';
+const contentGrid = document.getElementById('contentGrid');
+const postsTab = document.getElementById('postsTab');
+const shopTab = document.getElementById('shopTab');
+
+// Load JSON based on tab
+function loadContent(tab) {
+  const jsonFile = tab === 'posts' ? 'links.json' : 'shop.json';
+  fetch(jsonFile)
+    .then(res => res.json())
+    .then(items => {
+      contentGrid.innerHTML = '';
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        if(tab === 'posts'){
+          card.innerHTML = `
+            ${item.img ? `<img src="${item.img}" alt="${item.title}">` : ''}
+            <h3>${item.title}</h3>
+            <a href="${item.url}" target="_blank" class="btn">Open Post</a>
+          `;
+        } else {
+          const shareButtons = `
+            <a href="https://wa.me/?text=${encodeURIComponent(item.url)}" target="_blank" class="btn">💬 WhatsApp</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(item.url)}" target="_blank" class="btn">📘 Facebook</a>
+            <a href="#" onclick="navigator.clipboard.writeText('${item.url}'); alert('Link copied!'); return false;" class="btn">📋 Copy URL</a>
+          `;
+          card.innerHTML = `
+            <img src="${item.img || 'https://via.placeholder.com/300x150?text=No+Image'}" alt="${item.title}">
+            <h3>${item.title}</h3>
+            <div class="price">${item.price || ''}</div>
+            <a href="${item.url}" target="_blank" class="btn">Buy Now</a>
+            <div class="mt-2">${shareButtons}</div>
+          `;
+        }
+        contentGrid.appendChild(card);
+      });
+    })
+    .catch(err => console.error('Error loading JSON:', err));
 }
 
-// Fetch JSON file containing posts/products
-fetch('links.json')
-  .then(res => res.json())
-  .then(items => {
-    const grid = document.getElementById('projectGrid');
-    items.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        ${item.img ? `<img src="${item.img}" alt="${item.title}">` : ''}
-        <h3 class="text-lg font-semibold mb-2">${item.title}</h3>
-        <a href="${item.url}" target="_blank">Open Post</a>
-        <a href="#" onclick="navigator.clipboard.writeText('${item.url}'); showSnackbar('${item.snackbar || 'Link Copied!'}'); return false;">📋 Copy URL</a>
-      `;
-      grid.appendChild(card);
-    });
-  })
-  .catch(err => console.error('Error loading JSON:', err));
+// Tab click handlers
+postsTab.addEventListener('click', () => {
+  currentTab = 'posts';
+  postsTab.classList.add('active');
+  shopTab.classList.remove('active');
+  loadContent(currentTab);
+});
+
+shopTab.addEventListener('click', () => {
+  currentTab = 'shop';
+  shopTab.classList.add('active');
+  postsTab.classList.remove('active');
+  loadContent(currentTab);
+});
+
+// Initial load
+loadContent(currentTab);
 </script>
 
 </body>

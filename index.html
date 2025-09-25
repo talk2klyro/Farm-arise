@@ -3,47 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog/Project Showcase — Tier 2</title>
+<title>Farm Rise — Tier 2 Blog Showcase</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { background:#050510; color:#f1f5f9; font-family:'Inter', sans-serif; margin:0; padding:2rem; }
-  .grid { display:grid; gap:1.5rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-  .card { background: rgba(15,15,25,0.85); backdrop-filter: blur(8px); border:1px solid #00f6ff; border-radius:1rem; padding:1rem; text-align:center; transition: all 0.3s; }
-  .card:hover { transform: translateY(-4px) scale(1.02); border-color:#ff007a; }
-  .card img { width:100%; border-radius:0.75rem; margin-bottom:0.75rem; object-fit:cover; height:150px; }
-  .card a { display:inline-block; margin-top:0.5rem; padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid #00f6ff; color:#00f6ff; transition:0.3s; text-decoration:none; font-weight:500; }
-  .card a:hover { background:#00f6ff; color:#000; }
-  footer { text-align:center; margin-top:3rem; font-size:0.85rem; color:#94a3b8; }
+  body { font-family:'Inter',sans-serif; background:#f3f4f6; margin:0; padding:0; display:flex; min-height:100vh; }
+  /* Sidebar */
+  .sidebar { width:250px; background:#1f2937; color:#f9fafb; padding:1rem; display:flex; flex-direction:column; }
+  .sidebar h1 { font-size:1.8rem; font-weight:700; margin-bottom:1rem; color:#10b981; }
+  .sidebar a { color:#f3f4f6; margin:0.5rem 0; text-decoration:none; padding:0.5rem 1rem; border-radius:0.5rem; transition:0.3s; }
+  .sidebar a:hover { background:#10b981; color:#000; }
+  /* Main content */
+  .main { flex:1; padding:2rem; }
+  .grid { display:grid; gap:1.5rem; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); }
+  .card { background:#fff; border-radius:1rem; padding:1rem; box-shadow:0 4px 20px rgba(0,0,0,0.1); transition:all 0.3s; text-align:center; position:relative; }
+  .card:hover { transform: translateY(-4px) scale(1.02); }
+  .card img { width:100%; border-radius:0.75rem; margin-bottom:0.75rem; object-fit:cover; height:160px; }
+  .card button { margin-top:0.5rem; padding:0.5rem 1rem; background:#10b981; color:#fff; border:none; border-radius:0.5rem; cursor:pointer; transition:0.3s; }
+  .card button:hover { background:#059669; }
+  /* Snackbar */
+  #snackbar { visibility:hidden; min-width:250px; background:#333; color:#fff; text-align:center; border-radius:0.5rem; padding:1rem; position:fixed; z-index:999; left:50%; bottom:30px; transform:translateX(-50%); font-weight:500; }
+  #snackbar.show { visibility:visible; animation:fadein 0.5s, fadeout 0.5s 2.5s; }
+  @keyframes fadein { from {bottom:0; opacity:0;} to {bottom:30px; opacity:1;} }
+  @keyframes fadeout { from {bottom:30px; opacity:1;} to {bottom:0; opacity:0;} }
+  /* Share Modal */
+  #shareModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000; }
+  #shareModal .modal-content { background:#fff; padding:2rem; border-radius:1rem; text-align:center; width:90%; max-width:400px; }
+  #shareModal button { margin-top:1rem; padding:0.5rem 1rem; border:none; border-radius:0.5rem; background:#10b981; color:#fff; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<section class="grid" id="projectGrid">
-  <!-- Dynamic cards will be injected here -->
-</section>
+<!-- Sidebar -->
+<div class="sidebar">
+  <h1>Farm Rise</h1>
+  <a href="#projects">All Posts</a>
+  <a href="shop.html">Shop Products</a>
+</div>
 
-<footer>&copy; <span id="year"></span> Tier 2 Blog Showcase</footer>
+<!-- Main Content -->
+<div class="main">
+  <section class="grid" id="projectGrid">
+    <!-- Cards injected from JSON -->
+  </section>
+</div>
+
+<!-- Snackbar -->
+<div id="snackbar">Link copied to clipboard!</div>
+
+<!-- Share Modal -->
+<div id="shareModal">
+  <div class="modal-content">
+    <p>Share this post:</p>
+    <input type="text" id="shareLink" readonly style="width:100%; padding:0.5rem; border-radius:0.5rem; margin-top:0.5rem;">
+    <button id="closeModal">Close</button>
+  </div>
+</div>
 
 <script>
-document.getElementById('year').textContent = new Date().getFullYear();
-
-// Fetch JSON file containing blog/project links
-fetch('links.json')
+// Fetch posts from JSON
+fetch('posts.json')
   .then(res => res.json())
-  .then(items => {
+  .then(posts => {
     const grid = document.getElementById('projectGrid');
-    items.forEach(item => {
+    posts.forEach(post => {
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
-        ${item.img ? `<img src="${item.img}" alt="${item.title}">` : ''}
-        <h3 class="text-lg font-semibold mb-2">${item.title}</h3>
-        <a href="${item.url}" target="_blank">Open Post</a>
+        ${post.img ? `<img src="${post.img}" alt="${post.title}">` : ''}
+        <h3>${post.title}</h3>
+        <button onclick="openShare('${post.url}')">Share</button>
       `;
       grid.appendChild(card);
     });
   })
-  .catch(err => console.error('Error loading JSON:', err));
+  .catch(err => console.error(err));
+
+// Share Modal
+const modal = document.getElementById('shareModal');
+const shareLink = document.getElementById('shareLink');
+function openShare(url){
+  shareLink.value = url;
+  modal.style.display = 'flex';
+}
+
+// Close Modal
+document.getElementById('closeModal').onclick = () => modal.style.display = 'none';
+
+// Snackbar
+function showSnackbar(msg){
+  const sb = document.getElementById('snackbar');
+  sb.textContent = msg;
+  sb.className = 'show';
+  setTimeout(()=>{ sb.className = sb.className.replace('show',''); },3000);
+}
 </script>
 
 </body>

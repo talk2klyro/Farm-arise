@@ -3,37 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Details — FarmRise</title>
+<title>Farm Rise — Post</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family:'Inter', sans-serif; background:#050510; color:#f1f5f9; padding:2rem; }
-  .card { max-width:700px; margin:auto; background: rgba(15,15,25,0.85); backdrop-filter: blur(10px); border:1px solid #00f6ff; border-radius:1rem; padding:2rem; }
-  .card img { width:100%; border-radius:1rem; margin-bottom:1.5rem; }
-  h1 { color:#00f6ff; margin-bottom:1rem; font-size:2.5rem; }
-  p { color:#cbd5e1; line-height:1.6; }
+  body { background:#050510; color:#f1f5f9; font-family:'Inter', sans-serif; margin:0; padding:2rem; }
+  article { max-width:800px; margin:auto; }
+  img { width:100%; border-radius:0.75rem; margin:1rem 0; }
+  a.back { display:inline-block; margin-top:1rem; color:#00f6ff; text-decoration:underline; }
 </style>
 </head>
 <body>
-<div class="card" id="postContent"></div>
+
+<article>
+  <h1 id="postTitle" class="text-3xl font-bold text-[#00f6ff] mb-4"></h1>
+  <img id="postImg" alt="">
+  <p id="postContent" class="mt-4 text-gray-300"></p>
+  <a href="index.html" class="back">← Back to Posts</a>
+</article>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const slug = params.get('project');
+const urlParams = new URLSearchParams(window.location.search);
+const postId = urlParams.get('id') || 0;
 
-fetch('links.json')
+fetch('posts.json')
   .then(res => res.json())
-  .then(projects => {
-    const project = projects.find(p => p.slug === slug);
-    if(project){
-      document.getElementById('postContent').innerHTML = `
-        <h1>${project.title}</h1>
-        <img src="${project.img}" alt="${project.title}">
-        <p>${project.short_desc} Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</p>
-      `;
-    } else {
-      document.getElementById('postContent').innerHTML = '<p class="text-red-500">Project not found.</p>';
+  .then(posts => {
+    const post = posts[postId];
+    if(post){
+      document.getElementById('postTitle').textContent = post.title;
+      document.getElementById('postImg').src = post.img;
+      document.getElementById('postContent').textContent = post.content;
     }
-  });
+  })
+  .catch(err => console.error(err));
 </script>
+
 </body>
 </html>
